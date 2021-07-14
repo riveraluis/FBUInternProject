@@ -6,11 +6,20 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/btnLogout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="logout"
-        android:layout_alignParentEnd="true" />
+    <FrameLayout
+        android:id="@+id/flContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottomNavigation"/>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_alignParentBottom="true"
+        app:itemHorizontalTranslationEnabled="false"
+        app:labelVisibilityMode="unlabeled"
+        app:itemBackground="@color/white"
+        app:menu="@menu/menu_bottom_navigation" />
 
 </RelativeLayout>

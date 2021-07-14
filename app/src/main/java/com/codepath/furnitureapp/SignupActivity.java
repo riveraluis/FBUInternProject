@@ -32,7 +32,7 @@ public class SignupActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);
         btnDone = findViewById(R.id.btnDone);
 
-        // Call signup method which registers new user into Parse database
+        // Call signupUser method which registers new user into Parse database
         btnDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

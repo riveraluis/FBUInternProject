@@ -74,7 +74,6 @@ public class LoginActivity extends AppCompatActivity {
                 if (e != null) {
                     Log.e(TAG, "Issue with login", e);
                     Toast.makeText(LoginActivity.this, "Issue with login", Toast.LENGTH_SHORT).show();
-
                     return;
                 }
                 // Logged in successfully; navigates to MainActivity
