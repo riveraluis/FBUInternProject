@@ -1,4 +1,4 @@
-# FBU Final Intern Project - Furnitur Buy/Sell App
+# FBU Final Intern Project - Furniture Buy/Sell App
 
 Furniture Buy/Sell App is a mobile commerce app that connects students of the same college and facilitates the process of selling furniture and household items.
 
