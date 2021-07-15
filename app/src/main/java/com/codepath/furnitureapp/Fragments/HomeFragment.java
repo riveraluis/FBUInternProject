@@ -16,9 +16,11 @@ import android.view.ViewGroup;
 import com.codepath.furnitureapp.Post;
 import com.codepath.furnitureapp.PostsAdapter;
 import com.codepath.furnitureapp.R;
+import com.codepath.furnitureapp.SignupActivity;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +28,6 @@ import java.util.List;
 public class HomeFragment extends Fragment {
 
     public static final String TAG = "PostsFragment";
-    public static final String message = "Created post fragment";
     private RecyclerView rvPosts;
     protected PostsAdapter adapter;
     protected List<Post> allPosts;
@@ -75,20 +76,24 @@ public class HomeFragment extends Fragment {
         query.findInBackground(new FindCallback<Post>() {
             @Override
             public void done(List<Post> posts, ParseException e) {
-                // check for errors
+                // Check for errors
                 if (e != null) {
                     Log.e(TAG, "Issue with getting posts", e);
                     return;
                 }
 
+                allPosts.clear();
                 // For debugging purposes print every post description to logcat
                 for (Post post : posts) {
                     Log.i(TAG, "Post: " + post.getDescription() + ", username: " + post.getUser().getUsername());
+                    // Check if the post is from a user who is from the same school as current user.
+                    // If yes, then add post to feed.
+                    String postSchool = post.getUser().getString(SignupActivity.KEY_UNIVERSITY);
+                    String userSchool = ParseUser.getCurrentUser().getString(SignupActivity.KEY_UNIVERSITY);
+                    if (postSchool.equals(userSchool)) {
+                        allPosts.add(post);
+                    }
                 }
-
-                // Save received posts to list and notify adapter of new data
-                allPosts.clear();
-                allPosts.addAll(posts);
                 adapter.notifyDataSetChanged();
             }
         });
