@@ -13,6 +13,7 @@ public class ParseApplication extends Application {
         super.onCreate();
 
         ParseObject.registerSubclass(Post.class);
+        ParseObject.registerSubclass(Furniture.class);
 
         Parse.initialize(new Parse.Configuration.Builder(this)
                 .applicationId("tBpIRlSHCbWHQO45REv0XSErNCD0f4blrKrGU6A0")

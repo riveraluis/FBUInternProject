@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/profile_toolbar">
+    android:id="@+id/search_toolbar">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -11,19 +11,25 @@
         android:padding="10dp">
 
         <TextView
-            android:id="@+id/tvMyProfile"
+            android:id="@+id/tvSearchPage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="My Profile"
-            android:textSize="20sp"/>
+            android:text="Search" />
+
+        <TextView
+            android:id="@+id/tvSortBy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sort by:"
+            android:layout_toStartOf="@+id/ivSortBySettings"
+            android:layout_marginEnd="5dp"/>
 
         <ImageView
-            android:id="@+id/ivProfileSettings"
+            android:id="@+id/ivSortBySettings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_baseline_menu_24"
-            android:layout_alignParentEnd="true" />
-
+            android:layout_alignParentEnd="true"/>
     </RelativeLayout>
 
 </androidx.appcompat.widget.Toolbar>

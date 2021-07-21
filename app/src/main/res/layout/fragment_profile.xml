@@ -1,12 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Fragments.ProfileFragment">
 
-    <include
-        android:id="@+id/profile_toolbar"
-        layout="@layout/profile_toolbar" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/svPosts">
 
-</FrameLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <include
+                android:id="@+id/profile_toolbar"
+                layout="@layout/profile_toolbar" />
+
+            <ImageView
+                android:id="@+id/ivProfilePicture"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_below="@+id/profile_toolbar"
+                android:layout_centerInParent="true"
+                app:srcCompat="@drawable/ic_baseline_person_24"
+                tools:srcCompat="@tools:sample/avatars" />
+
+            <TextView
+                android:id="@+id/tvNameOfUser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_below="@+id/ivProfilePicture"
+                android:layout_marginTop="20dp"
+                android:textSize="20dp"
+                android:text="Name"/>
+
+            <TextView
+                android:id="@+id/tvProfileUsername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvNameOfUser"
+                android:layout_marginTop="10dp"
+                android:layout_centerInParent="true"
+                android:text="username"/>
+
+            <TextView
+                android:id="@+id/tvEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvProfileUsername"
+                android:layout_centerInParent="true"
+                android:text="email"
+                android:layout_marginTop="7dp"/>
+
+
+            <ImageView
+                android:id="@+id/ivSeeGridPosts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_grid_on_24"
+                android:layout_toStartOf="@+id/ivProfilePicture"
+                android:layout_marginTop="20dp"
+                android:layout_below="@id/tvEmail"
+                android:textSize="20sp"/>
+
+            <ImageView
+                android:id="@+id/ivSeeFavorited"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_star_border_24"
+                android:layout_toEndOf="@+id/ivProfilePicture"
+                android:layout_below="@+id/tvEmail"
+                android:layout_marginTop="20dp"
+                android:layout_toRightOf="@+id/ivSeeGridPosts"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvGridPosts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/ivSeeFavorited"
+                android:layout_marginTop="10dp" >
+
+            </androidx.recyclerview.widget.RecyclerView>
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+</RelativeLayout>

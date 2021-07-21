@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.codepath.furnitureapp.Post;
 import com.codepath.furnitureapp.PostsAdapter;
@@ -68,10 +69,9 @@ public class HomeFragment extends Fragment {
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         // Include data referred by user key
         query.include(Post.KEY_USER);
-        // Limit query to latest 20 items
-        query.setLimit(20);
-        // Order posts by creation date (newest first)
         query.addDescendingOrder(Post.KEY_CREATED_AT);
+        query.whereEqualTo(Post.KEY_SCHOOL, ParseUser.getCurrentUser().getString(SignupActivity.KEY_UNIVERSITY));
+
         // Start  asynchronous call for posts
         query.findInBackground(new FindCallback<Post>() {
             @Override
@@ -83,16 +83,9 @@ public class HomeFragment extends Fragment {
                 }
 
                 allPosts.clear();
-                // For debugging purposes print every post description to logcat
                 for (Post post : posts) {
                     Log.i(TAG, "Post: " + post.getDescription() + ", username: " + post.getUser().getUsername());
-                    // Check if the post is from a user who is from the same school as current user.
-                    // If yes, then add post to feed.
-                    String postSchool = post.getUser().getString(SignupActivity.KEY_UNIVERSITY);
-                    String userSchool = ParseUser.getCurrentUser().getString(SignupActivity.KEY_UNIVERSITY);
-                    if (postSchool.equals(userSchool)) {
-                        allPosts.add(post);
-                    }
+                    allPosts.add(post);
                 }
                 adapter.notifyDataSetChanged();
             }

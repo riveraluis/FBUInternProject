@@ -13,6 +13,9 @@ public class Post extends ParseObject {
     public static final String KEY_USER = "user";
     public static final String KEY_PRICE = "price";
     public static final String KEY_CREATED_AT = "createdAt";
+    public static final String KEY_FURNITURE = "furniture";
+    public static final String KEY_COMMON_FIELDS = "commonFields";
+    public static final String KEY_SCHOOL = "school";
 
     public String getDescription() {
         return getString(KEY_DESCRIPTION);
@@ -38,7 +41,20 @@ public class Post extends ParseObject {
         put(KEY_USER, user);
     }
 
+    public ParseObject getFurniture() { return getParseObject(KEY_FURNITURE); }
+
+    public void setFurniture(Furniture furniture) { put(KEY_FURNITURE, furniture); }
+
     public int getPrice() { return getInt(KEY_PRICE); }
 
     public void setPrice(int price) { put(KEY_PRICE, price); }
+
+    public int getCommonFields() { return getInt(KEY_COMMON_FIELDS); }
+
+    public void setCommonFields(int commonFields) { put(KEY_COMMON_FIELDS, commonFields); }
+
+    public String getSchool() { return(KEY_SCHOOL); }
+
+    public void setSchool(String school) { put(KEY_SCHOOL, school); }
+
 }

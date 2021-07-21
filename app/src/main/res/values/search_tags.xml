@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string-array name="categories">
+        <item>Choose...</item>
+        <item>Sofas</item>
+        <item>Chairs</item>
+        <item>Other seating</item>
+        <item>Bedding</item>
+        <item>Tables</item>
+        <item>Office</item>
+        <item>Storage</item>
+        <item>Light fixtures</item>
+        <item>Decor</item>
+        <item>Other</item>
+    </string-array>
+
+    <string-array name="materials">
+        <item>Choose...</item>
+        <item>Wood</item>
+        <item>Leather</item>
+        <item>Fabric</item>
+        <item>Plastic</item>
+        <item>Metal</item>
+        <item>Other</item>
+    </string-array>
+
+    <string-array name="colors">
+        <item>Choose...</item>
+        <item>Black</item>
+        <item>White</item>
+        <item>Brown</item>
+        <item>Cream</item>
+        <item>Tan</item>
+        <item>Red</item>
+        <item>Blue</item>
+        <item>Yellow</item>
+        <item>Green</item>
+        <item>Purple</item>
+        <item>Orange</item>
+        <item>Pink</item>
+        <item>Other</item>
+    </string-array>
+
+    <string-array name="prices">
+        <item>Choose...</item>
+        <item>Under 100</item>
+        <item>100-200</item>
+        <item>200-300</item>
+        <item>300-400</item>
+        <item>400-500</item>
+        <item>500+</item>
+    </string-array>
+
+    <string-array name="condition">
+        <item>Choose...</item>
+        <item>Excellent</item>
+        <item>Very good</item>
+        <item>Good</item>
+        <item>Acceptable</item>
+    </string-array>
+
+</resources>

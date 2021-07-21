@@ -20,11 +20,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.codepath.furnitureapp.Furniture;
 import com.codepath.furnitureapp.Post;
 import com.codepath.furnitureapp.R;
 import com.parse.ParseException;
@@ -53,6 +57,10 @@ public class ComposeFragment extends Fragment {
     private Button btnSubmit;
     private File photoFile;
     public String photoFileName = "photo.jpg";
+    private Spinner spCategory;
+    private Spinner spMaterial;
+    private Spinner spColor;
+    private Spinner spCondition;
 
     public ComposeFragment() {
         // Required empty public constructor
@@ -73,7 +81,33 @@ public class ComposeFragment extends Fragment {
         btnSubmit = view.findViewById(R.id.btnSubmit);
         etSetItemPrice = view.findViewById(R.id.etSetItemPrice);
         btnUploadPic = view.findViewById(R.id.btnUploadPic);
+        spCategory = view.findViewById(R.id.spCategory);
+        spMaterial = view.findViewById(R.id.spMaterial);
+        spColor = view.findViewById(R.id.spColor);
+        spCondition = view.findViewById(R.id.spCondition);
 
+        // Create and set array adapters for each spinner
+        ArrayAdapter<String> categoriesAdapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                getResources().getStringArray(R.array.categories));
+        spCategory.setAdapter(categoriesAdapter);
+
+        ArrayAdapter<String> materialsAdapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                getResources().getStringArray(R.array.materials));
+        spMaterial.setAdapter(materialsAdapter);
+
+        ArrayAdapter<String> colorsAdapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                getResources().getStringArray(R.array.colors));
+        spColor.setAdapter(colorsAdapter);
+
+        ArrayAdapter<String> conditionAdapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                getResources().getStringArray(R.array.condition));
+        spCondition.setAdapter(conditionAdapter);
+
+        // Set listeners for buttons
         btnTakePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,6 +128,11 @@ public class ComposeFragment extends Fragment {
             public void onClick(View v) {
                 String description = etDescription.getText().toString();
                 String itemPrice = etSetItemPrice.getText().toString();
+                String category = spCategory.getSelectedItem().toString();
+                String material = spMaterial.getSelectedItem().toString();
+                String color = spColor.getSelectedItem().toString();
+                String condition = spCondition.getSelectedItem().toString();
+
                 if (description.isEmpty()) {
                     Toast.makeText(getContext(), "Description cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
@@ -104,7 +143,7 @@ public class ComposeFragment extends Fragment {
                     return;
                 }
                 ParseUser currentUser = ParseUser.getCurrentUser();
-                savePost(description, currentUser, photoFile, itemPrice);
+                savePost(description, currentUser, photoFile, itemPrice, category, material, color, condition);
             }
         });
     }
@@ -190,13 +229,26 @@ public class ComposeFragment extends Fragment {
         return new File(mediaStorageDir.getPath() + File.separator + fileName);
     }
 
-    private void savePost(String description, ParseUser currentUser, File photoFile, String itemPrice) {
+    private void savePost(String description, ParseUser currentUser, File photoFile, String itemPrice,
+                          String category, String material, String color, String condition) {
+
+        // Create a new furniture item
+        Furniture furniture = new Furniture();
+        furniture.setCategory(category);
+        furniture.setMaterial(material);
+        furniture.setFurnitureColor(color);
+        furniture.setCondition(condition);
+
         // Create a new post
         Post post = new Post();
+        post.setPrice(Integer.parseInt(itemPrice));
+        post.setFurniture(furniture);
         post.setDescription(description);
         post.setImage(new ParseFile(photoFile));
         post.setUser(currentUser);
-        post.setPrice(Integer.parseInt(itemPrice));
+        post.setCommonFields(3);
+        post.setSchool(ParseUser.getCurrentUser().getString("school"));
+
         // Once we have all our post info call this method to save it in background thread
         post.saveInBackground(new SaveCallback() {
             @Override
