@@ -33,9 +33,11 @@ public class SignupActivity extends AppCompatActivity {
     public static final String UNIVERSITIES_URL = "http://universities.hipolabs.com/search?country=united%20states";
     public static final String TAG = "SignupActivity";
     public static final String KEY_UNIVERSITY = "school";
+    public static final String KEY_FULLNAME = "fullName";
     private EditText etUsername;
     private EditText etPassword;
     private EditText etEmail;
+    private EditText etFullName;
     private AutoCompleteTextView actvSuggestionBox;
     private Button btnDone;
     ArrayList<University> universities = new ArrayList<>();
@@ -49,6 +51,7 @@ public class SignupActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         etEmail = findViewById(R.id.etEmail);
         btnDone = findViewById(R.id.btnDone);
+        etFullName = findViewById(R.id.etFullname);
         actvSuggestionBox = findViewById(R.id.actvSuggestionBox);
 
         // Set adapter to see universities and choose
@@ -62,7 +65,8 @@ public class SignupActivity extends AppCompatActivity {
                 signupUser(etUsername.getText().toString(),
                         etPassword.getText().toString(),
                         etEmail.getText().toString(),
-                        actvSuggestionBox.getText().toString());
+                        actvSuggestionBox.getText().toString(),
+                        etFullName.getText().toString());
             }
         });
 
@@ -88,14 +92,16 @@ public class SignupActivity extends AppCompatActivity {
         });
     }
 
-    private void signupUser(String username, String password, String email, String school) {
+    private void signupUser(String username, String password, String email, String school, String fullName) {
         // Create the ParseUser
         ParseUser user = new ParseUser();
         // Set core properties
         user.setUsername(username);
         user.setPassword(password);
         user.setEmail(email);
+        user.put(KEY_FULLNAME, fullName);
         user.put(KEY_UNIVERSITY, school);
+        Log.i(TAG, "User info: email: " + user.getEmail() + " full name: " + user.getString(KEY_FULLNAME));
 
         // Invoke signUpInBackground
         user.signUpInBackground(new SignUpCallback() {

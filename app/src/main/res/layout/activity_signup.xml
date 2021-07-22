@@ -7,6 +7,12 @@
     android:padding="20dp">
 
     <EditText
+        android:id="@+id/etFullname"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Your name"/>
+
+    <EditText
         android:id="@+id/etUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

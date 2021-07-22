@@ -27,8 +27,10 @@ import com.codepath.furnitureapp.PostsAdapter;
 import com.codepath.furnitureapp.ProfilePostsAdapter;
 import com.codepath.furnitureapp.ProfileSettings;
 import com.codepath.furnitureapp.R;
+import com.codepath.furnitureapp.SignupActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -44,6 +46,9 @@ public class ProfileFragment extends Fragment {
     protected List<Post> allPosts;
     private ImageView ivProfileSettings;
     private ImageView ivProfilePicture;
+    private ImageView ivSeeGridPosts;
+    private ImageView ivSeeFavorited;
+    private TextView tvFullName;
     private TextView tvUsername;
     private TextView tvEmail;
 
@@ -68,6 +73,9 @@ public class ProfileFragment extends Fragment {
         tvUsername = view.findViewById(R.id.tvProfileUsername);
         tvEmail = view.findViewById(R.id.tvEmail);
         ivProfileSettings = view.findViewById(R.id.ivProfileSettings);
+        tvFullName = view.findViewById(R.id.tvNameOfUser);
+        ivSeeGridPosts = view.findViewById(R.id.ivSeeGridPosts);
+        ivSeeFavorited = view.findViewById(R.id.ivSeeFavorited);
 
         // Set up RecyclerView and adapter
         rvGridPosts = view.findViewById(R.id.rvGridPosts);
@@ -80,6 +88,10 @@ public class ProfileFragment extends Fragment {
         // Query posts
         queryPosts();
 
+        tvUsername.setText(ParseUser.getCurrentUser().getUsername());
+        tvEmail.setText(ParseUser.getCurrentUser().getEmail());
+        tvFullName.setText(ParseUser.getCurrentUser().getString(SignupActivity.KEY_FULLNAME));
+
         // Go to profile settings when clicked
         ivProfileSettings.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,8 +101,21 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        tvUsername.setText(ParseUser.getCurrentUser().getUsername());
-        tvEmail.setText(ParseUser.getCurrentUser().getEmail());
+        ivSeeFavorited.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        ivSeeGridPosts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+
     }
 
     protected void queryPosts() {
