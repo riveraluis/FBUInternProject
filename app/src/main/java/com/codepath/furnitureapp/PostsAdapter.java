@@ -6,8 +6,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,6 +19,7 @@ import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.parse.SaveCallback;
 
 import java.util.List;
 
@@ -24,6 +27,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     Context context;
     private List<Post> posts;
+    public static final String TAG = "PostsAdapter";
 
     public PostsAdapter(Context context, List<Post> posts) {
         this.context = context;
@@ -52,6 +56,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private ImageView ivImage;
         private TextView tvDescription;
         private TextView tvPrice;
+        private ImageButton likeButton;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -59,6 +64,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             ivImage = itemView.findViewById(R.id.ivImage);
             tvDescription = itemView.findViewById(R.id.tvDescription);
             tvPrice = itemView.findViewById(R.id.tvPrice);
+            likeButton = itemView.findViewById(R.id.ibLikeButton);
         }
 
         public void bind(Post post) {
@@ -66,6 +72,30 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvDescription.setText(post.getDescription());
             tvUsername.setText(post.getUser().getUsername());
             tvPrice.setText(String.valueOf(post.getPrice()));
+            if (post.getLiked()) {
+                likeButton.setSelected(true);
+            }
+            likeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    likeButton.setSelected(!likeButton.isSelected());
+                    if (likeButton.isSelected()) {
+                        post.setLiked(true);
+                    } else {
+                        post.setLiked(false);
+                    }
+                    post.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (e != null) {
+                                Log.e(TAG, "Error while saving post!", e);
+                                Toast.makeText(context, "Error while saving post!", Toast.LENGTH_SHORT).show();
+                            }
+                            Log.i(TAG, "Post save was successful!");
+                        }
+                    });
+                }
+            });
             ParseFile image = post.getImage();
             if (image != null) {
                 Glide.with(context).load(image.getUrl()).into(ivImage);

@@ -16,11 +16,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.codepath.furnitureapp.Post;
 import com.codepath.furnitureapp.PostsAdapter;
@@ -34,6 +37,7 @@ import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,11 +50,12 @@ public class ProfileFragment extends Fragment {
     protected List<Post> allPosts;
     private ImageView ivProfileSettings;
     private ImageView ivProfilePicture;
-    private ImageView ivSeeGridPosts;
-    private ImageView ivSeeFavorited;
+    private ImageButton ivSeeGridPosts;
+    private ImageButton ivSeeFavorited;
     private TextView tvFullName;
     private TextView tvUsername;
     private TextView tvEmail;
+    private boolean selectedFavorites = false;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -101,21 +106,31 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        ivSeeFavorited.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
+        // Set grid to be default selected
+        // Set listeners to toggle between favorites and grid view
+        ivSeeGridPosts.setSelected(true);
         ivSeeGridPosts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if (ivSeeFavorited.isSelected()) {
+                    ivSeeFavorited.setSelected(false);
+                    ivSeeGridPosts.setSelected(true);
+                }
+                queryPosts();
             }
         });
 
-
+        ivSeeFavorited.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ivSeeGridPosts.isSelected()) {
+                    ivSeeGridPosts.setSelected(false);
+                    ivSeeFavorited.setSelected(true);
+                }
+                selectedFavorites = true;
+                queryPosts();
+            }
+        });
     }
 
     protected void queryPosts() {
@@ -125,6 +140,11 @@ public class ProfileFragment extends Fragment {
         query.include(Post.KEY_USER);
         query.whereEqualTo(Post.KEY_USER, ParseUser.getCurrentUser());
         query.addDescendingOrder(Post.KEY_CREATED_AT);
+
+        if (selectedFavorites) {
+            query.whereEqualTo(Post.KEY_LIKED, true);
+            selectedFavorites = false;
+        }
 
         // Start an asynchronous call for posts
         query.findInBackground(new FindCallback<Post>() {
@@ -136,9 +156,15 @@ public class ProfileFragment extends Fragment {
                     return;
                 }
 
-                // For debugging purposes print every post description to logcat
-                for (Post post : posts) {
-                    Log.i(TAG, "Profile: " + post.getDescription() + ", username: " + post.getUser().getUsername());
+                // Only add liked posts when on favorites page then return
+                if (selectedFavorites) {
+                    allPosts.clear();
+                    for (Post post: posts)
+                        if (post.getLiked())
+                            allPosts.add(post);
+
+                    profilePostsAdapter.notifyDataSetChanged();
+                    return;
                 }
 
                 // Save received posts to list and notify adapter of new data

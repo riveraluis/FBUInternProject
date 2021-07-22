@@ -16,6 +16,7 @@ public class Post extends ParseObject {
     public static final String KEY_FURNITURE = "furniture";
     public static final String KEY_COMMON_FIELDS = "commonFields";
     public static final String KEY_SCHOOL = "school";
+    public static final String KEY_LIKED = "liked";
 
     public String getDescription() {
         return getString(KEY_DESCRIPTION);
@@ -56,5 +57,9 @@ public class Post extends ParseObject {
     public String getSchool() { return(KEY_SCHOOL); }
 
     public void setSchool(String school) { put(KEY_SCHOOL, school); }
+
+    public boolean getLiked() { return getBoolean(KEY_LIKED); }
+
+    public void setLiked(boolean liked) { put(KEY_LIKED, liked); }
 
 }

@@ -246,7 +246,7 @@ public class ComposeFragment extends Fragment {
         post.setDescription(description);
         post.setImage(new ParseFile(photoFile));
         post.setUser(currentUser);
-        post.setCommonFields(3);
+        post.setLiked(false);
         post.setSchool(ParseUser.getCurrentUser().getString("school"));
 
         // Once we have all our post info call this method to save it in background thread

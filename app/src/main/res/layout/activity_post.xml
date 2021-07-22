@@ -19,11 +19,20 @@
         android:layout_below="@+id/tvUsername"
         tools:srcCompat="@tools:sample/avatars"/>
 
+    <ImageButton
+        android:id="@+id/ibLikeButton"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:clickable="true"
+        android:background="@drawable/favorited_selector"
+        android:layout_below="@+id/ivImage"/>
+
     <TextView
         android:id="@+id/tvDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/ivImage"
+        android:layout_below="@+id/ibLikeButton"
+        android:layout_marginTop="5dp"
         android:text="description"/>
 
     <TextView
@@ -39,8 +48,7 @@
         android:layout_height="wrap_content"
         android:text="35"
         android:layout_below="@+id/tvDescription"
-        android:layout_toEndOf="@+id/tvPriceText"
-        />
+        android:layout_toEndOf="@+id/tvPriceText" />
 
 
 </RelativeLayout>

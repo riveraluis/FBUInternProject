@@ -56,25 +56,26 @@
                 android:text="email"
                 android:layout_marginTop="7dp"/>
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/ivSeeGridPosts"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_baseline_grid_on_24"
+                android:clickable="true"
+                android:background="@drawable/gridposts_selector"
                 android:layout_toStartOf="@+id/ivProfilePicture"
                 android:layout_marginTop="20dp"
                 android:layout_below="@id/tvEmail"
                 android:textSize="20sp"/>
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/ivSeeFavorited"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_baseline_star_border_24"
+                android:background="@drawable/favorited_selector"
                 android:layout_toEndOf="@+id/ivProfilePicture"
+                android:clickable="true"
                 android:layout_below="@+id/tvEmail"
-                android:layout_marginTop="20dp"
-                android:layout_toRightOf="@+id/ivSeeGridPosts"/>
+                android:layout_marginTop="20dp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvGridPosts"
