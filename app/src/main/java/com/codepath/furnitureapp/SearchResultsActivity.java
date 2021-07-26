@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -40,6 +41,7 @@ public class SearchResultsActivity extends AppCompatActivity {
     private boolean selectedPriceSorting = true;
     private int low = 0;
     private int high = 0;
+    private SwipeRefreshLayout swipeContainer;
 
     @Override
     public void onCreate( Bundle savedInstanceState) {
@@ -53,6 +55,21 @@ public class SearchResultsActivity extends AppCompatActivity {
         rvPosts.setAdapter(adapter);
         // Set the layout manager on the recycler view
         rvPosts.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        swipeContainer = findViewById(R.id.swipeContainer);
+
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                queryPosts();
+                swipeContainer.setRefreshing(false);
+            }
+        });
+
+        // Configure the refreshing colors
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
 
         // Get info from bundle
         Bundle extras = getIntent().getExtras();
@@ -64,7 +81,7 @@ public class SearchResultsActivity extends AppCompatActivity {
 
         // Query posts and set common fields
         setPriceRanges();
-        setPostCommonFields();
+        queryPosts();
     }
 
     public void setPriceRanges() {
@@ -92,7 +109,7 @@ public class SearchResultsActivity extends AppCompatActivity {
         }
     }
 
-    protected void setPostCommonFields() {
+    protected void queryPosts() {
         // Specify what type of data we want to query - Post.class
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_FURNITURE);
@@ -109,7 +126,7 @@ public class SearchResultsActivity extends AppCompatActivity {
                     return;
                 }
 
-                allPosts.clear();
+                //allPosts.clear();
                 for (Post post : posts) {
                     // Clear out before using
                     post.setCommonFields(0);
@@ -122,20 +139,20 @@ public class SearchResultsActivity extends AppCompatActivity {
                     if (selectedPriceSorting) {
                         // Check if item is within set range
                         if (postPrice >= low && postPrice < high) {
-                            savePost(post);
+                            setCommonFields(post);
                         }
                     }
                     else {
-                        savePost(post);
+                        setCommonFields(post);
                     }
                 }
             }
         });
 
-        queryPosts();
+        addPosts();
     }
 
-    public void savePost(Post post) {
+    public void setCommonFields(Post post) {
         // Check if search criteria matches furniture, and set commonFields
         ParseObject furniture = post.getParseObject(Post.KEY_FURNITURE);
         checkFieldMatches(post, Furniture.KEY_CATEGORY, category, furniture);
@@ -163,14 +180,14 @@ public class SearchResultsActivity extends AppCompatActivity {
         }
     }
 
-    public void queryPosts() {
+    public void addPosts() {
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_USER);
         query.include(Post.KEY_FURNITURE);
 
         // Order items by relevance
-        query.orderByDescending(Post.KEY_COMMON_FIELDS);
         query.whereEqualTo(Post.KEY_SCHOOL, ParseUser.getCurrentUser().getString(SignupActivity.KEY_UNIVERSITY));
+        query.orderByDescending(Post.KEY_COMMON_FIELDS);
 
         query.findInBackground(new FindCallback<Post>() {
             @Override
@@ -180,17 +197,18 @@ public class SearchResultsActivity extends AppCompatActivity {
                     Log.e(TAG, "Issue with getting posts", e);
                     return;
                 }
-
+                allPosts.clear();
                 for (Post post: posts) {
-                    // First check if the posts are from appropriate school
                     int postPrice = post.getPrice();
                     if (selectedPriceSorting) {
                         // Check if item is within set range
                         if (postPrice >= low && postPrice < high) {
+                            Log.i(TAG, "description: " + post.getDescription() + " CF: " + post.getCommonFields());
                             allPosts.add(post);
                         }
                     }
                     else {
+                        Log.i(TAG, "description: " + post.getDescription() + " CF: " + post.getCommonFields());
                         allPosts.add(post);
                     }
                 }

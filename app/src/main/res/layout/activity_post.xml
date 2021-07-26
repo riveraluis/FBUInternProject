@@ -21,11 +21,12 @@
 
     <ImageButton
         android:id="@+id/ibLikeButton"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ivImage"
         android:clickable="true"
-        android:background="@drawable/favorited_selector"
-        android:layout_below="@+id/ivImage"/>
+        android:src="@drawable/favorited_selector"
+        android:background="@null"/>
 
     <TextView
         android:id="@+id/tvDescription"

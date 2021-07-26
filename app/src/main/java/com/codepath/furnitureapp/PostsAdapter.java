@@ -57,6 +57,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private TextView tvDescription;
         private TextView tvPrice;
         private ImageButton likeButton;
+        private Post tempPost;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -65,10 +66,17 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvDescription = itemView.findViewById(R.id.tvDescription);
             tvPrice = itemView.findViewById(R.id.tvPrice);
             likeButton = itemView.findViewById(R.id.ibLikeButton);
+            itemView.setOnClickListener(new DoubleClickListener() {
+                @Override
+                public void onDoubleClick(View v) {
+                    likePost(tempPost);
+                }
+            });
         }
 
         public void bind(Post post) {
             // Bind the post data to the view elements
+            tempPost = post;
             tvDescription.setText(post.getDescription());
             tvUsername.setText(post.getUser().getUsername());
             tvPrice.setText(String.valueOf(post.getPrice()));
@@ -78,28 +86,32 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             likeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    likeButton.setSelected(!likeButton.isSelected());
-                    if (likeButton.isSelected()) {
-                        post.setLiked(true);
-                    } else {
-                        post.setLiked(false);
-                    }
-                    post.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if (e != null) {
-                                Log.e(TAG, "Error while saving post!", e);
-                                Toast.makeText(context, "Error while saving post!", Toast.LENGTH_SHORT).show();
-                            }
-                            Log.i(TAG, "Post save was successful!");
-                        }
-                    });
+                    likePost(post);
                 }
             });
             ParseFile image = post.getImage();
             if (image != null) {
                 Glide.with(context).load(image.getUrl()).into(ivImage);
             }
+        }
+
+        public void likePost(Post post) {
+            likeButton.setSelected(!likeButton.isSelected());
+            if (likeButton.isSelected()) {
+                tempPost.setLiked(true);
+            } else {
+                tempPost.setLiked(false);
+            }
+            tempPost.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e != null) {
+                        Log.e(TAG, "Error while saving post!", e);
+                        Toast.makeText(context, "Error while saving post!", Toast.LENGTH_SHORT).show();
+                    }
+                    Log.i(TAG, "Post save was successful!");
+                }
+            });
         }
     }
 }
