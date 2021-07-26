@@ -1,6 +1,8 @@
 package com.codepath.furnitureapp.Fragments;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.os.Bundle;
 
@@ -25,6 +27,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.codepath.furnitureapp.Post;
 import com.codepath.furnitureapp.PostsAdapter;
 import com.codepath.furnitureapp.ProfilePostsAdapter;
@@ -33,12 +37,17 @@ import com.codepath.furnitureapp.R;
 import com.codepath.furnitureapp.SignupActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.FindCallback;
+import com.parse.GetDataCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -131,6 +140,23 @@ public class ProfileFragment extends Fragment {
                 queryPosts();
             }
         });
+
+        // Set Profile picture
+        ParseFile profilePicture = ParseUser.getCurrentUser().getParseFile("profilePicture");
+        if (profilePicture != null) {
+            profilePicture.getDataInBackground(new GetDataCallback() {
+                public void done(byte[] data, ParseException e) {
+                    if (e == null) {
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                        if (bitmap != null)
+                            Glide.with(getContext()).load(bitmap).apply(RequestOptions.circleCropTransform()).into(ivProfilePicture);
+                        else { Log.d(TAG, "file null?"); }
+                    }
+                    else { Log.d(TAG, "ParseFile ParseException: " + e.toString()); }
+                }
+            });
+        }
+        else { Log.d(TAG, "ParseFile is null"); }
     }
 
     protected void queryPosts() {

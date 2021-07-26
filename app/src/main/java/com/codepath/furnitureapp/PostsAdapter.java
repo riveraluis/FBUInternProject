@@ -1,7 +1,6 @@
 package com.codepath.furnitureapp;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,19 +14,23 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.List;
+
 
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
 
     Context context;
     private List<Post> posts;
     public static final String TAG = "PostsAdapter";
+    public static final String KEY_PROFILE_PIC = "profilePicture";
 
     public PostsAdapter(Context context, List<Post> posts) {
         this.context = context;
@@ -58,6 +61,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private TextView tvPrice;
         private ImageButton likeButton;
         private Post tempPost;
+        private ImageView profilePic;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -66,6 +70,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvDescription = itemView.findViewById(R.id.tvDescription);
             tvPrice = itemView.findViewById(R.id.tvPrice);
             likeButton = itemView.findViewById(R.id.ibLikeButton);
+            profilePic = itemView.findViewById(R.id.ivProfileImage);
             itemView.setOnClickListener(new DoubleClickListener() {
                 @Override
                 public void onDoubleClick(View v) {
@@ -92,6 +97,14 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             ParseFile image = post.getImage();
             if (image != null) {
                 Glide.with(context).load(image.getUrl()).into(ivImage);
+            }
+            ParseFile profilepic = post.getUser().getParseFile(KEY_PROFILE_PIC);
+            if (profilepic != null) {
+                Glide.with(context).load(profilepic.getUrl()).apply(RequestOptions.circleCropTransform()).into(profilePic);
+            }
+            else {
+                Log.i(TAG, "There is no profile picture for this user.");
+                Glide.with(context).load(R.drawable.ic_baseline_person_24).apply(RequestOptions.circleCropTransform()).into(profilePic);
             }
         }
 
