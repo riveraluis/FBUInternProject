@@ -4,21 +4,21 @@ Furnishare is a mobile commerce app that connects students of the same college a
 
 ## MVP:
 
-[X] User can log in/out and sign up with school email
-[X] User should be able to search for an item specifying desired criteria
-[X] User can post an item for sale
-[X] User can view their profile as well as others
-[X] User can see posts on timeline and refresh for new feed
+- [X] User can log in/out and sign up with school email
+- [X] User should be able to search for an item specifying desired criteria
+- [X] User can post an item for sale
+- [X] User can view their profile as well as others
+- [X] User can see posts on timeline and refresh for new feed
 
 ## Stretch Stories
 
-[X] Direct messaging
-[ ] Endless scrolling
-[X] Bio for each user
-[X] Profile pictures
-[ ] Adding more animations and styling/colors
-[ ] Commenting on posts
-[ ] Create Post details activity when post is selected
+- [X] Direct messaging
+- [ ] Endless scrolling
+- [X] Bio for each user
+- [X] Profile pictures
+- [ ] Adding more animations and styling/colors
+- [ ] Commenting on posts
+- [ ] Create Post details activity when post is selected
 
 ## Format: 
    
