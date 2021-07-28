@@ -1,120 +1,81 @@
-package com.codepath.furnitureapp.Fragments;
+package com.codepath.furnitureapp;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.os.PersistableBundle;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.codepath.furnitureapp.Post;
-import com.codepath.furnitureapp.PostsAdapter;
-import com.codepath.furnitureapp.ProfilePostsAdapter;
-import com.codepath.furnitureapp.ProfileSettings;
-import com.codepath.furnitureapp.R;
-import com.codepath.furnitureapp.SignupActivity;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.codepath.furnitureapp.Fragments.ProfileFragment;
 import com.parse.FindCallback;
 import com.parse.GetDataCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
-public class ProfileFragment extends Fragment {
+public class ClickUserProfileActivity extends AppCompatActivity {
 
     public static final String TAG = "ProfileFragment";
     private RecyclerView rvGridPosts;
     protected ProfilePostsAdapter profilePostsAdapter;
     protected List<Post> allPosts;
-    private ImageView ivProfileSettings;
+    protected List<Post> likedPosts;
     private ImageView ivProfilePicture;
     private ImageButton ivSeeGridPosts;
     private ImageButton ivSeeFavorited;
     private TextView tvFullName;
     private TextView tvUsername;
     private TextView tvEmail;
+    private TextView tvUserProfile;
     private boolean selectedFavorites = false;
 
-    public ProfileFragment() {
-        // Required empty public constructor
-    }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    }
 
-    @Override
-    public void onViewCreated(View view,  Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        setContentView(R.layout.user_profile);
+        ParseUser user = getIntent().getParcelableExtra("user");
 
-        // Create toolbar
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.profile_toolbar);
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-
-        ivProfilePicture = view.findViewById(R.id.ivProfilePicture);
-        tvUsername = view.findViewById(R.id.tvProfileUsername);
-        tvEmail = view.findViewById(R.id.tvEmail);
-        ivProfileSettings = view.findViewById(R.id.ivProfileSettings);
-        tvFullName = view.findViewById(R.id.tvNameOfUser);
-        ivSeeGridPosts = view.findViewById(R.id.ivSeeGridPosts);
-        ivSeeFavorited = view.findViewById(R.id.ivSeeFavorited);
+        ivProfilePicture = findViewById(R.id.ivProfilePicture);
+        tvUsername = findViewById(R.id.tvProfileUsername);
+        tvEmail = findViewById(R.id.tvEmail);
+        tvFullName = findViewById(R.id.tvNameOfUser);
+        ivSeeGridPosts = findViewById(R.id.ivSeeGridPosts);
+        ivSeeFavorited = findViewById(R.id.ivSeeFavorited);
+        tvUserProfile = findViewById(R.id.tvMyProfile);
 
         // Set up RecyclerView and adapter
-        rvGridPosts = view.findViewById(R.id.rvGridPosts);
+        rvGridPosts = findViewById(R.id.rvGridPosts);
         allPosts = new ArrayList<>();
-        profilePostsAdapter = new ProfilePostsAdapter(getContext(), allPosts);
+        profilePostsAdapter = new ProfilePostsAdapter(getApplicationContext(), allPosts);
         // Set the adapter on the recycler view
         rvGridPosts.setAdapter(profilePostsAdapter);
         // Set the layout manager on the recycler view
-        rvGridPosts.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        rvGridPosts.setLayoutManager(new GridLayoutManager(getApplicationContext(), 3));
         // Query posts
-        queryPosts();
+        queryPosts(user);
 
-        tvUsername.setText(ParseUser.getCurrentUser().getUsername());
-        tvEmail.setText(ParseUser.getCurrentUser().getEmail());
-        tvFullName.setText(ParseUser.getCurrentUser().getString(SignupActivity.KEY_FULLNAME));
-
-        // Go to profile settings when clicked
-        ivProfileSettings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(getContext(), ProfileSettings.class);
-                startActivity(i);
-            }
-        });
+        tvUsername.setText(user.getUsername());
+        Log.i(TAG, "users email " + user.getEmail());
+        tvEmail.setText(user.getEmail());
+        tvFullName.setText(user.getString(SignupActivity.KEY_FULLNAME));
+        tvUserProfile.setText(user.getUsername() + "'s Profile");
 
         // Set grid to be default selected
         // Set listeners to toggle between favorites and grid view
@@ -126,7 +87,7 @@ public class ProfileFragment extends Fragment {
                     ivSeeFavorited.setSelected(false);
                     ivSeeGridPosts.setSelected(true);
                 }
-                queryPosts();
+                queryPosts(user);
             }
         });
 
@@ -138,34 +99,34 @@ public class ProfileFragment extends Fragment {
                     ivSeeFavorited.setSelected(true);
                 }
                 selectedFavorites = true;
-                queryPosts();
+                queryPosts(user);
             }
         });
 
         // Set Profile picture
-        ParseFile profilePicture = ParseUser.getCurrentUser().getParseFile("profilePicture");
+        ParseFile profilePicture = user.getParseFile("profilePicture");
         if (profilePicture != null) {
             profilePicture.getDataInBackground(new GetDataCallback() {
                 public void done(byte[] data, ParseException e) {
                     if (e == null) {
                         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                         if (bitmap != null)
-                            Glide.with(getContext()).load(bitmap).apply(RequestOptions.circleCropTransform()).into(ivProfilePicture);
+                            Glide.with(getApplicationContext()).load(bitmap).apply(RequestOptions.circleCropTransform()).into(ivProfilePicture);
                     }
                     else Log.d(TAG, "ParseFile ParseException: " + e.toString());
                 }
             });
         }
-        else Log.d(TAG, "ParseFile is null");
+        else { Log.d(TAG, "Selected user does not have a profile picture."); }
     }
 
-    public void queryPosts() {
+    private void queryPosts(ParseUser user) {
         // Specify what type of data we want to query - Post.class
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         // Include data referred by user key
         query.include(Post.KEY_USER);
         if (!selectedFavorites)
-            query.whereEqualTo(Post.KEY_USER, ParseUser.getCurrentUser());
+            query.whereEqualTo(Post.KEY_USER, user);
 
         query.addDescendingOrder(Post.KEY_CREATED_AT);
 
@@ -183,7 +144,7 @@ public class ProfileFragment extends Fragment {
                 if (selectedFavorites) {
                     allPosts.clear();
                     for (Post post: posts)
-                        if (post.getLikedArray().contains(ParseUser.getCurrentUser().getObjectId()))
+                        if (post.getLikedArray().contains(user.getObjectId()))
                             allPosts.add(post);
 
                     profilePostsAdapter.notifyDataSetChanged();
@@ -197,12 +158,5 @@ public class ProfileFragment extends Fragment {
                 profilePostsAdapter.notifyDataSetChanged();
             }
         });
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false);
     }
 }

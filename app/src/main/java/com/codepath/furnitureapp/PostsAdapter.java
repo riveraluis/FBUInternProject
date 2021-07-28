@@ -1,6 +1,7 @@
 package com.codepath.furnitureapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,7 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.util.HashSet;
 import java.util.List;
 
 
@@ -29,10 +31,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     Context context;
     private List<Post> posts;
+    private List<String> likedPosts;
     public static final String TAG = "PostsAdapter";
     public static final String KEY_PROFILE_PIC = "profilePicture";
 
-    public PostsAdapter(Context context, List<Post> posts) {
+    public PostsAdapter(Context context, List<Post> posts ) {
         this.context = context;
         this.posts = posts;
     }
@@ -77,6 +80,14 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     likePost(tempPost);
                 }
             });
+            profilePic.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(context, ClickUserProfileActivity.class);
+                    i.putExtra("user", tempPost.getUser());
+                    context.startActivity(i);
+                }
+            });
         }
 
         public void bind(Post post) {
@@ -85,7 +96,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvDescription.setText(post.getDescription());
             tvUsername.setText(post.getUser().getUsername());
             tvPrice.setText(String.valueOf(post.getPrice()));
-            if (post.getLiked()) {
+
+            // If the current user exists in the list of users who liked this post,
+            // then set the like button to selected
+            if (post.getLikedArray().contains(ParseUser.getCurrentUser().getObjectId())) {
                 likeButton.setSelected(true);
             }
             likeButton.setOnClickListener(new View.OnClickListener() {
@@ -94,6 +108,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     likePost(post);
                 }
             });
+
             ParseFile image = post.getImage();
             if (image != null) {
                 Glide.with(context).load(image.getUrl()).into(ivImage);
@@ -102,20 +117,20 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             if (profilepic != null) {
                 Glide.with(context).load(profilepic.getUrl()).apply(RequestOptions.circleCropTransform()).into(profilePic);
             }
-            else {
-                Log.i(TAG, "There is no profile picture for this user.");
-                Glide.with(context).load(R.drawable.ic_baseline_person_24).apply(RequestOptions.circleCropTransform()).into(profilePic);
-            }
         }
 
         public void likePost(Post post) {
             likeButton.setSelected(!likeButton.isSelected());
-            if (likeButton.isSelected()) {
-                tempPost.setLiked(true);
-            } else {
-                tempPost.setLiked(false);
-            }
-            tempPost.saveInBackground(new SaveCallback() {
+            likedPosts =  post.getLikedArray();
+            if (likeButton.isSelected())
+                if (!(post.getLikedArray().contains(ParseUser.getCurrentUser().getObjectId())))
+                    likedPosts.add(ParseUser.getCurrentUser().getObjectId());
+
+            else likedPosts.remove(ParseUser.getCurrentUser().getObjectId());
+
+            post.setLikedArray(likedPosts);
+
+            post.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {
                     if (e != null) {
@@ -125,6 +140,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     Log.i(TAG, "Post save was successful!");
                 }
             });
+
+            likedPosts.clear();
         }
     }
 }

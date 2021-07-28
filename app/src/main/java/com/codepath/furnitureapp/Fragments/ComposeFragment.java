@@ -40,6 +40,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -246,8 +247,8 @@ public class ComposeFragment extends Fragment {
         post.setDescription(description);
         post.setImage(new ParseFile(photoFile));
         post.setUser(currentUser);
-        post.setLiked(false);
         post.setSchool(ParseUser.getCurrentUser().getString("school"));
+        post.setLikedArray(new ArrayList<>());
 
         // Once we have all our post info call this method to save it in background thread
         post.saveInBackground(new SaveCallback() {
