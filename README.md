@@ -1,24 +1,24 @@
-# FBU Final Intern Project - Furniture Buy/Sell App
+# FBU Final Intern Project - Furnishare
 
-Furniture Buy/Sell App is a mobile commerce app that connects students of the same college and facilitates the process of selling furniture and household items.
+Furnishare is a mobile commerce app that connects students of the same college and facilitates the process of finding furniture and household items for sale.
 
 ## MVP:
 
-- User can log in/out and sign up with school email
-- User should be able to search for an item specifying desired criteria
-- User can post an item for sale
-- User can view their profile as well as others
-- User can see posts on timeline and refresh for new feed
+[X] User can log in/out and sign up with school email
+[X] User should be able to search for an item specifying desired criteria
+[X] User can post an item for sale
+[X] User can view their profile as well as others
+[X] User can see posts on timeline and refresh for new feed
 
 ## Stretch Stories
 
-- Different algorithms to sort search results (ie - chronological)
-- Direct messaging
-- Implementing Venmo API for in-app transactions
-- Endless scrolling
-- Bio for each user
-- Adding more animations and styling/colors
-- Commenting on posts
+[X] Direct messaging
+[ ] Endless scrolling
+[X] Bio for each user
+[X] Profile pictures
+[ ] Adding more animations and styling/colors
+[ ] Commenting on posts
+[ ] Create Post details activity when post is selected
 
 ## Format: 
    
@@ -38,7 +38,7 @@ Furniture Buy/Sell App is a mobile commerce app that connects students of the sa
         - Searching criteria:
          - Color
          - Material
-         - Measurements
+         - Category
          - Price
          - Condition
 
@@ -71,8 +71,24 @@ Furniture Buy/Sell App is a mobile commerce app that connects students of the sa
 
 ## Algorithm: 
 
-   Use a sorting algorithm to sort search results by relevance (the required fields when creating a new post).
+   Uses a sorting algorithm to sort search results by relevance using 5 criteria (the required fields when creating a new post).
+   
+## Challenges I faced and skills I learned while building this app:
 
+Week 1:
+- Being able to upload a photo from gallery
+- Figuring out how to implement a toolbar in order to add a menu item
+- Figuring out what to get and read a JSONArray with no key
+- Learned how to use AutoCompleteTextView
+
+Week 2:
+- How to retrieve data from another pointer subclass in Parse
+- Learned how to use a Spinner
+- Learned how to use a ScrollView
+- Learned how to use an ImageButton and selector to make an icon change state when clicked on
+
+Week 3:
+- How to create an Array in Parse and retrieve data from it.
 
 ## License
 
