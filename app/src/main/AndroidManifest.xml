@@ -22,7 +22,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FurnitureApp"
         android:usesCleartextTraffic="true">
-        <activity android:name="SimpleChat.SimpleChat"></activity>
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -46,6 +45,8 @@
         <activity android:name=".ProfileSettings" />
         <activity android:name=".SearchResultsActivity" />
         <activity android:name=".ClickUserProfileActivity" />
+        <activity android:name=".ChatActivity"/>
+        <activity android:name=".SimpleChat"/>
     </application>
 
 </manifest>

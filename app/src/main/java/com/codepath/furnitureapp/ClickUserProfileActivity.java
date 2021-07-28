@@ -1,9 +1,9 @@
 package com.codepath.furnitureapp;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.codepath.furnitureapp.Fragments.ProfileFragment;
 import com.parse.FindCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
@@ -28,13 +27,14 @@ import com.parse.ParseUser;
 import java.util.ArrayList;
 import java.util.List;
 
+
+
 public class ClickUserProfileActivity extends AppCompatActivity {
 
     public static final String TAG = "ProfileFragment";
     private RecyclerView rvGridPosts;
     protected ProfilePostsAdapter profilePostsAdapter;
     protected List<Post> allPosts;
-    protected List<Post> likedPosts;
     private ImageView ivProfilePicture;
     private ImageButton ivSeeGridPosts;
     private ImageButton ivSeeFavorited;
@@ -43,6 +43,7 @@ public class ClickUserProfileActivity extends AppCompatActivity {
     private TextView tvEmail;
     private TextView tvUserProfile;
     private boolean selectedFavorites = false;
+    private ImageView ivMessages;
 
 
     @Override
@@ -59,6 +60,7 @@ public class ClickUserProfileActivity extends AppCompatActivity {
         ivSeeGridPosts = findViewById(R.id.ivSeeGridPosts);
         ivSeeFavorited = findViewById(R.id.ivSeeFavorited);
         tvUserProfile = findViewById(R.id.tvMyProfile);
+        ivMessages = findViewById(R.id.ivMessages);
 
         // Set up RecyclerView and adapter
         rvGridPosts = findViewById(R.id.rvGridPosts);
@@ -100,6 +102,15 @@ public class ClickUserProfileActivity extends AppCompatActivity {
                 }
                 selectedFavorites = true;
                 queryPosts(user);
+            }
+        });
+
+        ivMessages.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getApplicationContext(), ChatActivity.class);
+                i.putExtra("receiver", user);
+                startActivity(i);
             }
         });
 
