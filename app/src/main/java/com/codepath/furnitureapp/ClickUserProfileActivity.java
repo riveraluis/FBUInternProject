@@ -45,7 +45,6 @@ public class ClickUserProfileActivity extends AppCompatActivity {
     private boolean selectedFavorites = false;
     private ImageView ivMessages;
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
