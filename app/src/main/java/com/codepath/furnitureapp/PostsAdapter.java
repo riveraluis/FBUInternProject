@@ -122,9 +122,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         public void likePost(Post post) {
             likeButton.setSelected(!likeButton.isSelected());
             likedPosts =  post.getLikedArray();
-            if (likeButton.isSelected())
+            if (likeButton.isSelected()) {
                 if (!(post.getLikedArray().contains(ParseUser.getCurrentUser().getObjectId())))
                     likedPosts.add(ParseUser.getCurrentUser().getObjectId());
+            }
 
             else likedPosts.remove(ParseUser.getCurrentUser().getObjectId());
 

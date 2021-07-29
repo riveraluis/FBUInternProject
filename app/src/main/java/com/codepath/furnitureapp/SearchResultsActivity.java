@@ -115,6 +115,7 @@ public class SearchResultsActivity extends AppCompatActivity {
         query.include(Post.KEY_FURNITURE);
         query.include(Post.KEY_USER);
         query.whereEqualTo(Post.KEY_SCHOOL, ParseUser.getCurrentUser().getString(SignupActivity.KEY_UNIVERSITY));
+        query.whereNotEqualTo(Post.KEY_USER, ParseUser.getCurrentUser());
 
         // Start  asynchronous call for posts
         query.findInBackground(new FindCallback<Post>() {
@@ -188,6 +189,7 @@ public class SearchResultsActivity extends AppCompatActivity {
         // Order items by relevance
         query.whereEqualTo(Post.KEY_SCHOOL, ParseUser.getCurrentUser().getString(SignupActivity.KEY_UNIVERSITY));
         query.orderByDescending(Post.KEY_COMMON_FIELDS);
+        query.whereNotEqualTo(Post.KEY_USER, ParseUser.getCurrentUser());
 
         query.findInBackground(new FindCallback<Post>() {
             @Override

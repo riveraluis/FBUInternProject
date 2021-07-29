@@ -122,7 +122,19 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
         public void bindMessage(Message message) {
             getProfileUrl(message.getUserId(), imageOther);
             body.setText(message.getBody());
-            name.setText(message.getUserId());
+
+            ParseQuery<ParseUser> query = ParseUser.getQuery();
+            query.whereMatches("objectId", message.getUserId());
+            query.getInBackground(message.getUserId(), new GetCallback<ParseUser>() {
+                public void done(ParseUser user, ParseException e) {
+                    if (e == null) {
+                        String nameOfUser = user.getString("fullName");
+                        Log.i(TAG, "name: " + nameOfUser);
+                        name.setText(nameOfUser);
+                    }
+                    else Log.i(TAG, "Users full name was not retrieved correctly");
+                }
+            });
         }
     }
 
