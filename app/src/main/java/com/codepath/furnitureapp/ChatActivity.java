@@ -37,6 +37,7 @@ public class ChatActivity extends AppCompatActivity {
     private ArrayList<Message> mMessages;
     private boolean mFirstLoad;
     private ChatAdapter mAdapter;
+    ParseUser recipient;
 
     private Handler myHandler = new android.os.Handler();
     Runnable mRefreshMessagesRunnable = new Runnable() {
@@ -51,6 +52,8 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        recipient = getIntent().getParcelableExtra("receiver");
         // User login
         if (ParseUser.getCurrentUser() != null) { // start with existing user
             startWithCurrentUser();
@@ -102,6 +105,7 @@ public class ChatActivity extends AppCompatActivity {
                 Message message = new Message();
                 message.setUserId(ParseUser.getCurrentUser().getObjectId());
                 message.setBody(data);
+                message.setSentTo(recipient.getObjectId());
                 message.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
@@ -117,10 +121,23 @@ public class ChatActivity extends AppCompatActivity {
 
     // Query messages from Parse so we can load them into  chat adapter
     void refreshMessages() {
-        ParseQuery<Message> query = ParseQuery.getQuery(Message.class);
-        query.setLimit(MAX_CHAT_MESSAGES_TO_SHOW);
-        query.orderByDescending("createdAt");
-        query.findInBackground(new FindCallback<Message>() {
+        ParseQuery<Message> queryIncoming = ParseQuery.getQuery(Message.class);
+        queryIncoming.whereEqualTo(Message.USER_ID_KEY, recipient.getObjectId());
+        queryIncoming.whereEqualTo(Message.SENT_TO_KEY, ParseUser.getCurrentUser().getObjectId());
+
+        ParseQuery<Message> queryOutgoing = ParseQuery.getQuery(Message.class);
+        queryOutgoing.whereEqualTo(Message.USER_ID_KEY, ParseUser.getCurrentUser().getObjectId());
+        queryOutgoing.whereEqualTo(Message.SENT_TO_KEY, recipient.getObjectId());
+
+        List<ParseQuery<Message>> messagesQuery = new ArrayList<ParseQuery<Message>>();
+        messagesQuery.add(queryIncoming);
+        messagesQuery.add(queryOutgoing);
+
+        ParseQuery<Message> mainQuery = ParseQuery.or(messagesQuery);
+        mainQuery.orderByDescending("createdAt");
+        mainQuery.setLimit(MAX_CHAT_MESSAGES_TO_SHOW);
+
+        mainQuery.findInBackground(new FindCallback<Message>() {
             public void done(List<Message> messages, ParseException e) {
                 if (e == null) {
                     mMessages.clear();
