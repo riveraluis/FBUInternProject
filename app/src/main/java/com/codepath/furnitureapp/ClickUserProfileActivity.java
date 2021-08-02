@@ -32,6 +32,8 @@ import java.util.List;
 public class ClickUserProfileActivity extends AppCompatActivity {
 
     public static final String TAG = "ProfileFragment";
+    public static final String KEY_RECIPIENT = "recipient";
+    public static final String KEY_PFP = "profilePicture";
     private RecyclerView rvGridPosts;
     protected ProfilePostsAdapter profilePostsAdapter;
     protected List<Post> allPosts;
@@ -73,7 +75,6 @@ public class ClickUserProfileActivity extends AppCompatActivity {
         queryPosts(user);
 
         tvUsername.setText(user.getUsername());
-        Log.i(TAG, "users email " + user.getEmail());
         tvEmail.setText(user.getEmail());
         tvFullName.setText(user.getString(SignupActivity.KEY_FULLNAME));
         tvUserProfile.setText(user.getUsername() + "'s Profile");
@@ -108,13 +109,13 @@ public class ClickUserProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(getApplicationContext(), ChatActivity.class);
-                i.putExtra("receiver", user);
+                i.putExtra(KEY_RECIPIENT, user);
                 startActivity(i);
             }
         });
 
         // Set Profile picture
-        ParseFile profilePicture = user.getParseFile("profilePicture");
+        ParseFile profilePicture = user.getParseFile(KEY_PFP);
         if (profilePicture != null) {
             profilePicture.getDataInBackground(new GetDataCallback() {
                 public void done(byte[] data, ParseException e) {

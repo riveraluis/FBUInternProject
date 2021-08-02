@@ -12,10 +12,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.codepath.furnitureapp.Fragments.ProfileFragment;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -25,6 +28,7 @@ import com.parse.SaveCallback;
 
 import java.util.HashSet;
 import java.util.List;
+import androidx.fragment.app.FragmentManager;
 
 
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
@@ -83,9 +87,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             profilePic.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent i = new Intent(context, ClickUserProfileActivity.class);
-                    i.putExtra("user", tempPost.getUser());
-                    context.startActivity(i);
+                    // direct user to either their profile or another user's profile
+                    if (tempPost.getUser().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
+                        MainActivity.bottomNavigationView.setSelectedItemId(R.id.action_profile);
+                    }
+                    else {
+                        Intent i = new Intent(context, ClickUserProfileActivity.class);
+                        i.putExtra("user", tempPost.getUser());
+                        context.startActivity(i);
+                    }
                 }
             });
         }
