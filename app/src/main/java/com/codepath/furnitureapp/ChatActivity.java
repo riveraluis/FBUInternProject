@@ -28,6 +28,9 @@ import java.util.concurrent.TimeUnit;
 
 public class ChatActivity extends AppCompatActivity {
 
+    public static final String KEY_RECENT_MESSAGES = "recentMessages";
+    public static final String KEY_RECIPIENT = "recipient";
+    public static final String KEY_SENT_TO = "sentTo";
     static final String TAG = ChatActivity.class.getSimpleName();
     static final int MAX_CHAT_MESSAGES_TO_SHOW = 50;
     static final long POLL_INTERVAL = TimeUnit.SECONDS.toMillis(3);
@@ -35,6 +38,7 @@ public class ChatActivity extends AppCompatActivity {
     private ImageButton ibSend;
     private RecyclerView rvChat;
     private ArrayList<Message> mMessages;
+    private List<RecentMessage> recentMessages;
     private boolean mFirstLoad;
     private ChatAdapter mAdapter;
     ParseUser recipient;
@@ -52,8 +56,8 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-
-        recipient = getIntent().getParcelableExtra("receiver");
+        recipient = getIntent().getParcelableExtra(KEY_RECIPIENT);
+        recentMessages = ParseUser.getCurrentUser().getList(KEY_RECENT_MESSAGES);
         // User login
         if (ParseUser.getCurrentUser() != null) { // start with existing user
             startWithCurrentUser();
@@ -96,6 +100,7 @@ public class ChatActivity extends AppCompatActivity {
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(ChatActivity.this);
         linearLayoutManager.setReverseLayout(true);
         rvChat.setLayoutManager(linearLayoutManager);
+        ParseUser user = ParseUser.getCurrentUser();
 
         // When send button is clicked, create message object on Parse
         ibSend.setOnClickListener(new View.OnClickListener() {
@@ -103,9 +108,32 @@ public class ChatActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String data = etMessage.getText().toString();
                 Message message = new Message();
-                message.setUserId(ParseUser.getCurrentUser().getObjectId());
+                message.setUserId(user.getObjectId());
                 message.setBody(data);
                 message.setSentTo(recipient.getObjectId());
+
+                // Create new RecentMessage object
+                RecentMessage mostRecentMessage = new RecentMessage();
+                mostRecentMessage.setRecentMessage(data);
+                mostRecentMessage.setRecentSentTo(recipient.getObjectId());
+
+                // Latest message gets added to recentMessages list in User class
+                if (!(recentMessages.contains(recipient.getObjectId()))) {
+                    recentMessages.add(mostRecentMessage);
+                }
+                else {
+                    for (RecentMessage m: recentMessages) {
+                        try {
+                            if (m.fetchIfNeeded().getString(KEY_SENT_TO).equals(recipient.getObjectId())) {
+                                recentMessages.remove(m);
+                                recentMessages.add(mostRecentMessage);
+                            }
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
                 message.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
@@ -114,45 +142,54 @@ public class ChatActivity extends AppCompatActivity {
                         refreshMessages();
                     }
                 });
+                user.put(KEY_RECENT_MESSAGES, recentMessages);
+                user.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        Log.i(TAG, "saving user in background");
+                    }
+                });
                 etMessage.setText(null);
             }
         });
     }
 
-    // Query messages from Parse so we can load them into  chat adapter
+    // Query messages from Parse so we can load them into chat adapter
     void refreshMessages() {
-        ParseQuery<Message> queryIncoming = ParseQuery.getQuery(Message.class);
-        queryIncoming.whereEqualTo(Message.USER_ID_KEY, recipient.getObjectId());
-        queryIncoming.whereEqualTo(Message.SENT_TO_KEY, ParseUser.getCurrentUser().getObjectId());
+            ParseQuery<Message> queryIncoming = ParseQuery.getQuery(Message.class);
+            queryIncoming.whereEqualTo(Message.USER_ID_KEY, recipient.getObjectId());
+            queryIncoming.whereEqualTo(Message.SENT_TO_KEY, ParseUser.getCurrentUser().getObjectId());
 
-        ParseQuery<Message> queryOutgoing = ParseQuery.getQuery(Message.class);
-        queryOutgoing.whereEqualTo(Message.USER_ID_KEY, ParseUser.getCurrentUser().getObjectId());
-        queryOutgoing.whereEqualTo(Message.SENT_TO_KEY, recipient.getObjectId());
+            ParseQuery<Message> queryOutgoing = ParseQuery.getQuery(Message.class);
+            queryOutgoing.whereEqualTo(Message.USER_ID_KEY, ParseUser.getCurrentUser().getObjectId());
+            queryOutgoing.whereEqualTo(Message.SENT_TO_KEY, recipient.getObjectId());
 
-        List<ParseQuery<Message>> messagesQuery = new ArrayList<ParseQuery<Message>>();
-        messagesQuery.add(queryIncoming);
-        messagesQuery.add(queryOutgoing);
+            // make a compound query of both incoming and outgoing messages
+            List<ParseQuery<Message>> messagesQuery = new ArrayList<ParseQuery<Message>>();
+            messagesQuery.add(queryIncoming);
+            messagesQuery.add(queryOutgoing);
 
-        ParseQuery<Message> mainQuery = ParseQuery.or(messagesQuery);
-        mainQuery.orderByDescending("createdAt");
-        mainQuery.setLimit(MAX_CHAT_MESSAGES_TO_SHOW);
+            ParseQuery<Message> mainQuery = ParseQuery.or(messagesQuery);
+            mainQuery.orderByDescending("createdAt");
+            mainQuery.setLimit(MAX_CHAT_MESSAGES_TO_SHOW);
 
-        mainQuery.findInBackground(new FindCallback<Message>() {
-            public void done(List<Message> messages, ParseException e) {
-                if (e == null) {
-                    mMessages.clear();
-                    mMessages.addAll(messages);
-                    mAdapter.notifyDataSetChanged();
-                    // Scroll to the bottom of the list on initial load
-                    if (mFirstLoad) {
-                        rvChat.scrollToPosition(0);
-                        mFirstLoad = false;
+            mainQuery.findInBackground(new FindCallback<Message>() {
+                public void done(List<Message> messages, ParseException e) {
+                    if (e == null) {
+                        mMessages.clear();
+                        mMessages.addAll(messages);
+                        mAdapter.notifyDataSetChanged();
+                        // Scroll to the bottom of the list on initial load
+                        if (mFirstLoad) {
+                            rvChat.scrollToPosition(0);
+                            mFirstLoad = false;
+                        }
+                    } else {
+                        Log.e("message", "Error Loading Messages" + e);
                     }
-                } else {
-                    Log.e("message", "Error Loading Messages" + e);
                 }
-            }
-        });
+            });
+
     }
 
     @Override

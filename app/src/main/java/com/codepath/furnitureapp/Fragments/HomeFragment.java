@@ -1,9 +1,10 @@
 package com.codepath.furnitureapp.Fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,9 +14,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.TextView;
+import android.widget.ImageView;
 
+import com.codepath.furnitureapp.RecentMessagesMenuActivity;
 import com.codepath.furnitureapp.Post;
 import com.codepath.furnitureapp.PostsAdapter;
 import com.codepath.furnitureapp.R;
@@ -35,6 +36,7 @@ public class HomeFragment extends Fragment {
     protected PostsAdapter adapter;
     protected List<Post> allPosts;
     private SwipeRefreshLayout swipeContainer;
+    private ImageView ivDirectMessages;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -43,9 +45,14 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.home_toolbar);
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+
         rvPosts = view.findViewById(R.id.rvPosts);
         allPosts = new ArrayList<>();
         swipeContainer = view.findViewById(R.id.swipeContainer);
+        ivDirectMessages = view.findViewById(R.id.ivDirectMessages);
 
         // Set refresh listener
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -53,6 +60,14 @@ public class HomeFragment extends Fragment {
             public void onRefresh() {
                 queryPosts();
                 swipeContainer.setRefreshing(false);
+            }
+        });
+
+        ivDirectMessages.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getContext(), RecentMessagesMenuActivity.class);
+                startActivity(i);
             }
         });
 

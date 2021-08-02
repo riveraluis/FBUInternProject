@@ -47,6 +47,7 @@
         <activity android:name=".ClickUserProfileActivity" />
         <activity android:name=".ChatActivity"/>
         <activity android:name=".SimpleChat"/>
+        <activity android:name=".RecentMessagesMenuActivity"/>
     </application>
 
 </manifest>
