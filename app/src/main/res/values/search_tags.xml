@@ -28,6 +28,7 @@
     <string-array name="colors">
         <item>Choose...</item>
         <item>Black</item>
+        <item>Grey</item>
         <item>White</item>
         <item>Brown</item>
         <item>Cream</item>

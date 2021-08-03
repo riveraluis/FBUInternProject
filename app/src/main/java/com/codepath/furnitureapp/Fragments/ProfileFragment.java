@@ -3,7 +3,11 @@ package com.codepath.furnitureapp.Fragments;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ImageDecoder;
+import android.graphics.drawable.Drawable;
 import android.media.Image;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,6 +19,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -48,9 +53,14 @@ import com.parse.SaveCallback;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+
+import static android.app.Activity.RESULT_OK;
+import static com.codepath.furnitureapp.Fragments.ComposeFragment.CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE;
+import static com.codepath.furnitureapp.Fragments.ComposeFragment.PICK_PHOTO_CODE;
 
 public class ProfileFragment extends Fragment {
 
@@ -66,6 +76,7 @@ public class ProfileFragment extends Fragment {
     private TextView tvUsername;
     private TextView tvEmail;
     private boolean selectedFavorites = false;
+    public static final String KEY_PROFILE_PIC = "profilePicture";
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -142,6 +153,14 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        ivProfilePicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onPickPhoto(v);
+            }
+        });
+
+
         // Set Profile picture
         ParseFile profilePicture = ParseUser.getCurrentUser().getParseFile("profilePicture");
         if (profilePicture != null) {
@@ -195,6 +214,80 @@ public class ProfileFragment extends Fragment {
                 allPosts.clear();
                 allPosts.addAll(posts);
                 profilePostsAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+    // Trigger gallery selection for a photo
+    public void onPickPhoto(View view) {
+        // Create intent for picking a photo from the gallery
+        Intent intent = new Intent(Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+        startActivityForResult(intent, PICK_PHOTO_CODE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if ((data != null) && requestCode == PICK_PHOTO_CODE) {
+            Uri photoUri = data.getData();
+
+            // Load the image located at photoUri into selectedImage
+            Bitmap selectedImage = loadFromUri(photoUri);
+            
+            Glide.with(this).load(selectedImage).apply(RequestOptions.circleCropTransform()).into(ivProfilePicture);
+            // Convert bitmap to image
+            try {
+               convertBitmapToFile(selectedImage);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void convertBitmapToFile(Bitmap bitmap) throws Exception {
+        // Convert bitmap to byte array
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0, bos);
+        byte[] bitmapdata = bos.toByteArray();
+
+        ParseFile file = new ParseFile(KEY_PROFILE_PIC, bitmapdata);
+        file.saveInBackground(new SaveCallback() {
+            public void done(ParseException e) {
+                if (null == e)
+                    saveProfilePicture(ParseUser.getCurrentUser(), file);
+            }
+        });
+    }
+
+    public Bitmap loadFromUri(Uri photoUri) {
+        Bitmap image = null;
+        try {
+            // Check version of Android on device
+            if(Build.VERSION.SDK_INT > 27){
+                // On newer versions of Android, use the new decodeBitmap method
+                ImageDecoder.Source source = ImageDecoder.createSource(getContext().getContentResolver(), photoUri);
+                image = ImageDecoder.decodeBitmap(source);
+            } else {
+                // Support older versions of Android by using getBitmap
+                image = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), photoUri);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return image;
+    }
+
+    public void saveProfilePicture(ParseUser user, ParseFile file) {
+        if (file == null) {
+            Log.i(TAG, "photofile is null");
+            return;
+        }
+        user.put("profilePicture", file);
+        user.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                Log.i(TAG, "saving user profile picture");
             }
         });
     }

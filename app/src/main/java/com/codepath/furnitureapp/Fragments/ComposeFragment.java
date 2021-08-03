@@ -145,6 +145,9 @@ public class ComposeFragment extends Fragment {
                 }
                 ParseUser currentUser = ParseUser.getCurrentUser();
                 savePost(description, currentUser, photoFile, itemPrice, category, material, color, condition);
+
+                spCategory.setSelection(0); spMaterial.setSelection(0);
+                spColor.setSelection(0); spCondition.setSelection(0);
             }
         });
     }
