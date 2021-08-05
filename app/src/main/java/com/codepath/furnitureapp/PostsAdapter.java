@@ -17,6 +17,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.request.RequestOptions;
 import com.codepath.furnitureapp.Fragments.ProfileFragment;
 import com.parse.GetCallback;
@@ -30,6 +31,8 @@ import java.util.HashSet;
 import java.util.List;
 import androidx.fragment.app.FragmentManager;
 
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
+
 
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
 
@@ -38,6 +41,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     private List<String> likedPosts;
     public static final String TAG = "PostsAdapter";
     public static final String KEY_PROFILE_PIC = "profilePicture";
+    public static final String KEY_USER = "user";
 
     public PostsAdapter(Context context, List<Post> posts ) {
         this.context = context;
@@ -66,7 +70,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private ImageView ivImage;
         private TextView tvDescription;
         private TextView tvPrice;
-        private ImageButton likeButton;
+        private ImageView likeButton;
         private Post tempPost;
         private ImageView profilePic;
 
@@ -93,7 +97,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     }
                     else {
                         Intent i = new Intent(context, ClickUserProfileActivity.class);
-                        i.putExtra("user", tempPost.getUser());
+                        i.putExtra(KEY_USER, tempPost.getUser());
                         context.startActivity(i);
                     }
                 }
@@ -119,10 +123,14 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 }
             });
 
+            int radius = 35; // corner radius, higher value = more rounded
+            int margin = 0; // crop margin, set to 0 for corners with no crop
             ParseFile image = post.getImage();
             if (image != null) {
-                Glide.with(context).load(image.getUrl()).into(ivImage);
+                Glide.with(context).load(image.getUrl()).transform(new CenterCrop(), new RoundedCornersTransformation(radius, margin))
+                        .into(ivImage);
             }
+
             ParseFile profilepic = post.getUser().getParseFile(KEY_PROFILE_PIC);
             if (profilepic != null) {
                 Glide.with(context).load(profilepic.getUrl()).apply(RequestOptions.circleCropTransform()).into(profilePic);
