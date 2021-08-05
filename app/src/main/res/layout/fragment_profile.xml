@@ -6,28 +6,36 @@
     android:layout_height="match_parent"
     tools:context=".Fragments.ProfileFragment">
 
-    <ScrollView
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swipeContainerProfile"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/svPosts">
+        android:layout_height="match_parent">
 
-        <RelativeLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:id="@+id/svPosts">
 
-            <include
-                android:id="@+id/profile_toolbar"
-                layout="@layout/profile_toolbar" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-           <include
-               android:id="@+id/userInfo"
-               android:layout_below="@+id/profile_toolbar"
-               layout="@layout/user_profile_elements"
-               android:layout_height="wrap_content"
-               android:layout_width="match_parent" />
+                <include
+                    android:id="@+id/profile_toolbar"
+                    layout="@layout/profile_toolbar" />
 
-        </RelativeLayout>
+               <include
+                   android:id="@+id/userInfo"
+                   android:layout_below="@+id/profile_toolbar"
+                   layout="@layout/user_profile_elements"
+                   android:layout_height="wrap_content"
+                   android:layout_width="match_parent" />
 
-    </ScrollView>
+            </RelativeLayout>
+
+        </ScrollView>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </RelativeLayout>

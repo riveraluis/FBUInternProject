@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.provider.MediaStore;
 import android.util.Log;
@@ -77,6 +78,7 @@ public class ProfileFragment extends Fragment {
     private TextView tvEmail;
     private boolean selectedFavorites = false;
     public static final String KEY_PROFILE_PIC = "profilePicture";
+    private SwipeRefreshLayout swipeContainer;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -102,6 +104,7 @@ public class ProfileFragment extends Fragment {
         tvFullName = view.findViewById(R.id.tvNameOfUser);
         ivSeeGridPosts = view.findViewById(R.id.ivSeeGridPosts);
         ivSeeFavorited = view.findViewById(R.id.ivSeeFavorited);
+        swipeContainer = view.findViewById(R.id.swipeContainerProfile);
 
         // Set up RecyclerView and adapter
         rvGridPosts = view.findViewById(R.id.rvGridPosts);
@@ -157,6 +160,15 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 onPickPhoto(v);
+            }
+        });
+
+        // Set refresh listener
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                queryPosts();
+                swipeContainer.setRefreshing(false);
             }
         });
 
