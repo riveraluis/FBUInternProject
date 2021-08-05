@@ -14,10 +14,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
@@ -26,26 +26,27 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RecentMessagesMenuAdapter extends RecyclerView.Adapter<RecentMessagesMenuAdapter.ViewHolder> {
+public class ConversationMenuAdapter extends RecyclerView.Adapter<ConversationMenuAdapter.ViewHolder> {
 
     Context context;
-    private List<RecentMessage> messagePreviews;
+    private List<Conversation> messagePreviews;
     public static final String TAG = "DirectMessageAdapter";
     public static final String KEY_OBJECT_ID = "objectId";
+    public static final String KEY_RECIPIENT = "recipient";
 
-    public RecentMessagesMenuAdapter(Context context, List<RecentMessage> messagePreviews) {
+    public ConversationMenuAdapter(Context context, List<Conversation> messagePreviews) {
         this.context = context;
         this.messagePreviews = messagePreviews;
     }
     @Override
     public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.message_preview, parent, false);
-        return new RecentMessagesMenuAdapter.ViewHolder(view);
+        return new ConversationMenuAdapter.ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull ViewHolder holder, int position) {
-        RecentMessage message = messagePreviews.get(position);
+        Conversation message = messagePreviews.get(position);
         try {
             holder.bind(message);
         } catch (ParseException e) {
@@ -63,7 +64,7 @@ public class RecentMessagesMenuAdapter extends RecyclerView.Adapter<RecentMessag
         private ImageView ivPreviewProfilePic;
         private TextView tvPreviewName;
         private TextView tvPreviewLatestMessage;
-        RecentMessage tempMessage;
+        Conversation tempConvo;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -75,12 +76,19 @@ public class RecentMessagesMenuAdapter extends RecyclerView.Adapter<RecentMessag
                 public void onClick(View v) {
                     Intent i = new Intent(context, ChatActivity.class);
                     // Query for correct user in order to direct correct chat
+                    String recipientId;
+                    if (!(tempConvo.getUserOne().equals(ParseUser.getCurrentUser().getObjectId()))) {
+                        recipientId =  tempConvo.getUserOne();
+                    }
+                    else recipientId = tempConvo.getUserTwo();
+
                     ParseQuery<ParseUser> query = ParseUser.getQuery();
-                    query.whereEqualTo(KEY_OBJECT_ID, tempMessage.getRecentSentTo());
-                    query.getInBackground(tempMessage.getRecentSentTo(), new GetCallback<ParseUser>() {
+                    query.whereEqualTo(KEY_OBJECT_ID, recipientId);
+
+                    query.getInBackground(recipientId, new GetCallback<ParseUser>() {
                         public void done(ParseUser user, ParseException e) {
                             if (e == null) {
-                                i.putExtra(SignupActivity.KEY_FULLNAME, user);
+                                i.putExtra(KEY_RECIPIENT, user);
                                 context.startActivity(i);
                             }
                         }
@@ -89,12 +97,18 @@ public class RecentMessagesMenuAdapter extends RecyclerView.Adapter<RecentMessag
             });
         }
 
-        public void bind(RecentMessage message) throws ParseException {
-            // Bind the post data to the view elements
-            tempMessage = message;
+        public void bind(Conversation convo) throws ParseException {
+
+            tempConvo = convo;
+            String recipientId;
+            if (!(convo.getUserOne().equals(ParseUser.getCurrentUser().getObjectId()))) {
+                recipientId =  convo.getUserOne();
+            }
+            else recipientId = convo.getUserTwo();
+
             ParseQuery<ParseUser> query = ParseUser.getQuery();
-            query.whereEqualTo(KEY_OBJECT_ID, message.fetchIfNeeded().getString(RecentMessage.SENT_TO_KEY));
-            query.getInBackground(message.getRecentSentTo(), new GetCallback<ParseUser>() {
+            query.whereEqualTo(KEY_OBJECT_ID, recipientId);
+            query.getInBackground(recipientId, new GetCallback<ParseUser>() {
                 public void done(ParseUser user, ParseException e) {
                     if (e == null) {
                         tvPreviewName.setText(user.getString(SignupActivity.KEY_FULLNAME));
@@ -102,7 +116,7 @@ public class RecentMessagesMenuAdapter extends RecyclerView.Adapter<RecentMessag
                         if (profilePic != null) {
                             Glide.with(context).load(profilePic.getUrl()).apply(RequestOptions.circleCropTransform()).into(ivPreviewProfilePic);
                         }
-                        tvPreviewLatestMessage.setText(message.getRecentMessage());
+                        tvPreviewLatestMessage.setText(convo.getRecentMessage());
                     }
                     else Log.i(TAG, "User's full name was not retrieved correctly");
                 }

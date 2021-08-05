@@ -18,7 +18,7 @@ public class ParseApplication extends Application {
         ParseObject.registerSubclass(Post.class);
         ParseObject.registerSubclass(Furniture.class);
         ParseObject.registerSubclass(Message.class);
-        ParseObject.registerSubclass(RecentMessage.class);
+        ParseObject.registerSubclass(Conversation.class);
 
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();

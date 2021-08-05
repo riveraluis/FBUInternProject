@@ -33,12 +33,11 @@ public class ChatActivity extends AppCompatActivity {
     public static final String KEY_SENT_TO = "sentTo";
     static final String TAG = ChatActivity.class.getSimpleName();
     static final int MAX_CHAT_MESSAGES_TO_SHOW = 50;
-    static final long POLL_INTERVAL = TimeUnit.SECONDS.toMillis(3);
+    static final long POLL_INTERVAL = TimeUnit.SECONDS.toMillis(10);
     private EditText etMessage;
     private ImageButton ibSend;
     private RecyclerView rvChat;
     private ArrayList<Message> mMessages;
-    private List<RecentMessage> recentMessages;
     private boolean mFirstLoad;
     private ChatAdapter mAdapter;
     ParseUser recipient;
@@ -57,7 +56,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         recipient = getIntent().getParcelableExtra(KEY_RECIPIENT);
-        recentMessages = ParseUser.getCurrentUser().getList(KEY_RECENT_MESSAGES);
+
         // User login
         if (ParseUser.getCurrentUser() != null) { // start with existing user
             startWithCurrentUser();
@@ -112,27 +111,75 @@ public class ChatActivity extends AppCompatActivity {
                 message.setBody(data);
                 message.setSentTo(recipient.getObjectId());
 
-                // Create new RecentMessage object
-                RecentMessage mostRecentMessage = new RecentMessage();
-                mostRecentMessage.setRecentMessage(data);
-                mostRecentMessage.setRecentSentTo(recipient.getObjectId());
+                ParseQuery<Conversation> userOneQueryAsSender = ParseQuery.getQuery(Conversation.class);
+                userOneQueryAsSender.whereEqualTo(Conversation.KEY_USERONE, ParseUser.getCurrentUser().getObjectId());
 
-                // Latest message gets added to recentMessages list in User class
-                if (!(recentMessages.contains(recipient.getObjectId()))) {
-                    recentMessages.add(mostRecentMessage);
-                }
-                else {
-                    for (RecentMessage m: recentMessages) {
-                        try {
-                            if (m.fetchIfNeeded().getString(KEY_SENT_TO).equals(recipient.getObjectId())) {
-                                recentMessages.remove(m);
-                                recentMessages.add(mostRecentMessage);
+                ParseQuery<Conversation> userOneQueryAsRecipient = ParseQuery.getQuery(Conversation.class);
+                userOneQueryAsRecipient.whereEqualTo(Conversation.KEY_USERTWO, ParseUser.getCurrentUser().getObjectId());
+
+                ParseQuery<Conversation> userTwoAsSender = ParseQuery.getQuery(Conversation.class);
+                userTwoAsSender.whereEqualTo(Conversation.KEY_USERONE, recipient.getObjectId());
+
+                ParseQuery<Conversation> userTwoAsRecipient = ParseQuery.getQuery(Conversation.class);
+                userTwoAsRecipient.whereEqualTo(Conversation.KEY_USERTWO, recipient.getObjectId());
+
+                List<ParseQuery<Conversation>> queries = new ArrayList<ParseQuery<Conversation>>();
+                queries.add(userOneQueryAsSender);
+                queries.add(userOneQueryAsRecipient);
+                queries.add(userTwoAsSender);
+                queries.add(userTwoAsRecipient);
+
+                Conversation convo = new Conversation();
+
+                ParseQuery<Conversation> mainQuery = ParseQuery.or(queries);
+                mainQuery.findInBackground(new FindCallback<Conversation>() {
+                    public void done(List<Conversation> conversations, ParseException e) {
+                        // results has the list of players that win a lot or haven't won much.
+                        boolean foundConvo = false;
+                        if (e != null) {
+                            Log.e(TAG, "Issue with getting conversations", e);
+                            return;
+                        }
+
+                        Log.i(TAG, "Conversations that match" + conversations.toString());
+
+                        if (conversations.isEmpty()) {
+                            Log.i(TAG, "Conversations list is empty" + conversations.toString());
+                            convo.setRecentMessage(data);
+                            convo.setUserOne(ParseUser.getCurrentUser().getObjectId());
+                            convo.setUserTwo(recipient.getObjectId());
+                            saveConversation(convo);
+
+                        }
+                        else {
+                            ParseUser currentUser = ParseUser.getCurrentUser();
+
+                            for (Conversation convo : conversations) {
+                                String userOneId = convo.getUserOne();
+                                String userTwoId = convo.getUserTwo();
+                                String currentUserId = currentUser.getObjectId();
+                                String recipientId = recipient.getObjectId();
+                                if ((userOneId.equals(currentUserId) || userOneId.equals(recipientId))
+                                        && (userTwoId.equals(currentUserId) || userTwoId.equals(recipientId))) {
+                                    foundConvo = true;
+                                    convo.setRecentMessage(data);
+                                    convo.saveInBackground(new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            Log.i(TAG, "saving updated conversation.");
+                                        }
+                                    });
+                                }
                             }
-                        } catch (ParseException e) {
-                            e.printStackTrace();
+                            if (!foundConvo) {
+                                convo.setRecentMessage(data);
+                                convo.setUserOne(ParseUser.getCurrentUser().getObjectId());
+                                convo.setUserTwo(recipient.getObjectId());
+                                saveConversation(convo);
+                            }
                         }
                     }
-                }
+                });
 
                 message.saveInBackground(new SaveCallback() {
                     @Override
@@ -142,14 +189,22 @@ public class ChatActivity extends AppCompatActivity {
                         refreshMessages();
                     }
                 });
-                user.put(KEY_RECENT_MESSAGES, recentMessages);
-                user.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        Log.i(TAG, "saving user in background");
-                    }
-                });
+
                 etMessage.setText(null);
+            }
+        });
+    }
+
+    private void saveConversation(Conversation convo) {
+        convo.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    Log.i(TAG, "saving new conversation.");
+                }
+                else {
+                    Log.i(TAG, "exception: " + e.toString());
+                }
             }
         });
     }
@@ -157,6 +212,7 @@ public class ChatActivity extends AppCompatActivity {
     // Query messages from Parse so we can load them into chat adapter
     void refreshMessages() {
             ParseQuery<Message> queryIncoming = ParseQuery.getQuery(Message.class);
+            Log.i(TAG, "recipient info: " + recipient);
             queryIncoming.whereEqualTo(Message.USER_ID_KEY, recipient.getObjectId());
             queryIncoming.whereEqualTo(Message.SENT_TO_KEY, ParseUser.getCurrentUser().getObjectId());
 
@@ -185,11 +241,10 @@ public class ChatActivity extends AppCompatActivity {
                             mFirstLoad = false;
                         }
                     } else {
-                        Log.e("message", "Error Loading Messages" + e);
+                        Log.e(TAG, "Error Loading Messages" + e);
                     }
                 }
             });
-
     }
 
     @Override
