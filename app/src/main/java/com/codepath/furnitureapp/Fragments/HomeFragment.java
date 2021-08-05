@@ -15,8 +15,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
-import com.codepath.furnitureapp.RecentMessagesMenuActivity;
+import com.codepath.furnitureapp.ConversationMenuActivity;
 import com.codepath.furnitureapp.Post;
 import com.codepath.furnitureapp.PostsAdapter;
 import com.codepath.furnitureapp.R;
@@ -37,6 +38,7 @@ public class HomeFragment extends Fragment {
     protected List<Post> allPosts;
     private SwipeRefreshLayout swipeContainer;
     private ImageView ivDirectMessages;
+    private TextView tvUniversityName;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -53,6 +55,9 @@ public class HomeFragment extends Fragment {
         allPosts = new ArrayList<>();
         swipeContainer = view.findViewById(R.id.swipeContainer);
         ivDirectMessages = view.findViewById(R.id.ivDirectMessages);
+        tvUniversityName = view.findViewById(R.id.tvUniversityName);
+
+        tvUniversityName.setText(ParseUser.getCurrentUser().getString(SignupActivity.KEY_UNIVERSITY));
 
         // Set refresh listener
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -66,7 +71,7 @@ public class HomeFragment extends Fragment {
         ivDirectMessages.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getContext(), RecentMessagesMenuActivity.class);
+                Intent i = new Intent(getContext(), ConversationMenuActivity.class);
                 startActivity(i);
             }
         });

@@ -14,18 +14,29 @@
             android:id="@+id/ivLogo"
             android:layout_width="55dp"
             android:layout_height="40dp"
-            android:layout_marginTop="2dp"
-            android:layout_centerHorizontal="true"
+            android:layout_marginTop="0dp"
+            android:layout_marginLeft="0dp"
             android:scaleType="centerCrop"
             android:src="@mipmap/ic_launcher" />
 
+        <TextView
+            android:id="@+id/tvUniversityName"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="University of Central Florida"
+            android:layout_toEndOf="@+id/ivLogo"
+            android:layout_marginTop="10dp"
+            android:textSize="19dp"
+            android:textStyle="bold"/>
+
         <ImageView
             android:id="@+id/ivDirectMessages"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="4dp"
             android:src="@drawable/ic_baseline_message_24"
-            android:layout_alignParentEnd="true" />
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="10dp"/>
 
     </RelativeLayout>
 
