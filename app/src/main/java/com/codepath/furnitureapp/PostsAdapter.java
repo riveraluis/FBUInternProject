@@ -98,6 +98,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     else {
                         Intent i = new Intent(context, ClickUserProfileActivity.class);
                         i.putExtra(KEY_USER, tempPost.getUser());
+                        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         context.startActivity(i);
                     }
                 }

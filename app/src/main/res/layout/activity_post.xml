@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -33,7 +32,7 @@
             android:layout_alignParentEnd="true"
             android:layout_marginLeft="25dp"
             android:layout_marginTop="10dp"
-            android:layout_marginRight="50dp"
+            android:layout_marginRight="25dp"
             android:layout_marginBottom="20dp"
             android:layout_height="300dp"
             android:layout_below="@+id/tvPriceText"
@@ -56,10 +55,9 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignParentEnd="true"
-            android:layout_below="@id/tvPrice"
-            android:layout_marginRight="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
-
             android:background="@null"
             android:clickable="true"
             android:src="@drawable/favorited_selector" />
@@ -70,6 +68,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvUsername"
             android:layout_toEndOf="@+id/ivProfileImage"
+            android:layout_marginRight="10dp"
             android:layout_marginTop="5dp"
             android:layout_marginLeft="10dp"
             android:text="description"/>
@@ -79,6 +78,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Price: $"
+            android:textStyle="bold"
             android:layout_below="@id/tvDescription"
             android:layout_toEndOf="@+id/ivProfileImage"
             android:layout_marginLeft="10dp"/>
@@ -88,6 +88,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="35"
+            android:textStyle="bold"
             android:layout_below="@+id/tvDescription"
             android:layout_toEndOf="@+id/tvPriceText"
             android:layout_marginBottom="25dp"/>

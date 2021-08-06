@@ -24,6 +24,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.request.RequestOptions;
 import com.codepath.furnitureapp.Fragments.ProfileFragment;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -33,69 +35,104 @@ import com.parse.SaveCallback;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
+
 import static com.parse.Parse.getApplicationContext;
 
 public class PostDetailsActivity extends AppCompatActivity  {
 
     private Post post;
-    private RecyclerView rvPosts;
     private TextView tvUsername;
     private ImageView ivImage;
     private ImageView ivProfilePic;
     private TextView tvDescription;
-    private ImageButton ibLikeButton;
+    private ImageView ibLikeButton;
     private TextView tvPrice;
     private Spinner spPostOptions;
-    private PostsAdapter adapter;
-    private ArrayList<Post> allPosts;
     public static final String TAG = "PostDetailsActivity";
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_details);
 
+        post = getIntent().getParcelableExtra("post");
+
+        tvUsername = findViewById(R.id.tvUsername);
+        ivImage = findViewById(R.id.ivImage);
+        tvDescription = findViewById(R.id.tvDescription);
+        tvPrice = findViewById(R.id.tvPrice);
+        ibLikeButton = findViewById(R.id.ibLikeButton);
+        ivProfilePic = findViewById(R.id.ivProfileImage);
         spPostOptions = findViewById(R.id.spPostOptions);
 
-        rvPosts = findViewById(R.id.rvPostsDetails);
-        allPosts = new ArrayList<>();
-        adapter = new PostsAdapter(getApplicationContext(), allPosts);
-        // Set the adapter on the recycler view
-        rvPosts.setAdapter(adapter);
-        // Set the layout manager on the recycler view
-        rvPosts.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        if (post.getUser().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
+            // Create and set array adapters for each spinner
+            ArrayAdapter<String> postOptionsAdapter = new ArrayAdapter<>(getApplicationContext(),
+                    android.R.layout.simple_spinner_dropdown_item,
+                    getResources().getStringArray(R.array.postOptions));
+            spPostOptions.setAdapter(postOptionsAdapter);
 
-        // Create and set array adapters for each spinner
-        ArrayAdapter<String> postOptionsAdapter = new ArrayAdapter<>(getApplicationContext(),
-                android.R.layout.simple_spinner_dropdown_item,
-                getResources().getStringArray(R.array.postOptions));
-        spPostOptions.setAdapter(postOptionsAdapter);
-
-        post = getIntent().getParcelableExtra("post");
-        allPosts.clear();
-        allPosts.add(post);
-        adapter.notifyDataSetChanged();
-
-        spPostOptions.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+            spPostOptions.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
             {
-                String selectedItem = parent.getItemAtPosition(position).toString();
-                if(selectedItem.equals("Delete"))
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
                 {
-                    Log.i(TAG, "delete was selected");
-                    post.deleteInBackground();
-                    spPostOptions.setSelection(0);
-                    finish();
+                    String selectedItem = parent.getItemAtPosition(position).toString();
+                    if(selectedItem.equals("Delete"))
+                    {
+                        Log.i(TAG, "delete was selected");
+                        post.deleteInBackground();
+                        spPostOptions.setSelection(0);
+                        finish();
+                    }
+                } // to close the onItemSelected
+                public void onNothingSelected(AdapterView<?> parent) { }
+            });
+        }
+
+        tvDescription.setText(post.getDescription());
+        tvUsername.setText(post.getUser().getUsername());
+        tvPrice.setText(String.valueOf(post.getPrice()));
+
+        ParseFile image = post.getImage();
+        int radius = 35; // corner radius, higher value = more rounded
+        int margin = 0; // crop margin, set to 0 for corners with no crop
+        if (image != null) {
+            Glide.with(getApplicationContext()).load(image.getUrl()).transform(new CenterCrop(), new RoundedCornersTransformation(radius, margin))
+                    .into(ivImage);
+        }
+
+        ParseFile profilepic = post.getUser().getParseFile("profilePicture");
+        if (profilepic != null) {
+            Glide.with(getApplicationContext()).load(profilepic.getUrl()).apply(RequestOptions.circleCropTransform()).into(ivProfilePic);
+        }
+        
+        ivProfilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // direct user to either their profile or another user's profile
+                if (post.getUser().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
+                    onBackPressed();
+                    MainActivity.bottomNavigationView.setSelectedItemId(R.id.action_profile);
                 }
-            } // to close the onItemSelected
-            public void onNothingSelected(AdapterView<?> parent)
-            {
+                else {
+                    Intent i = new Intent(getApplicationContext(), ClickUserProfileActivity.class);
+                    i.putExtra("user", post.getUser());
+                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    onBackPressed();
+                    startActivity(i);
+                }
 
             }
         });
 
+        overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.nothing, R.anim.bottom_down);
     }
 
 }
