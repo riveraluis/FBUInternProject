@@ -5,12 +5,18 @@
     android:layout_height="match_parent"
     tools:context=".Fragments.HomeFragment">
 
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvMessages"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/swipeContainerDirectMessages"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="15dp" />
+            android:layout_height="match_parent">
 
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvMessages"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="15dp" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </RelativeLayout>

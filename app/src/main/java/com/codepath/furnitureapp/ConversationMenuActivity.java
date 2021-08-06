@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -23,12 +24,22 @@ public class ConversationMenuActivity extends AppCompatActivity {
     private ConversationMenuAdapter adapter;
     public static final String TAG = "ConversationMenuActivity";
     public static final String KEY_OBJECT_ID = "objectId";
-
+    private SwipeRefreshLayout swipeContainer;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_direct_messages);
+
+        swipeContainer = findViewById(R.id.swipeContainerDirectMessages);
+        // Set refresh listener
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                queryMessages();
+                swipeContainer.setRefreshing(false);
+            }
+        });
 
         rvConversation = findViewById(R.id.rvMessages);
         allConversations = new ArrayList<>();
