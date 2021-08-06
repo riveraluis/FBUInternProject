@@ -6,6 +6,15 @@
     android:gravity="center"
     android:padding="20dp">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enter your information:"
+        android:layout_marginBottom="40dp"
+        android:textSize="25dp"
+        android:fontFamily="@font/convergence"
+        android:textColor="@color/dark_blue"/>
+
     <EditText
         android:id="@+id/etFullname"
         android:layout_width="match_parent"

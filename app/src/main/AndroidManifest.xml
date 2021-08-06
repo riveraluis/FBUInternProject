@@ -49,6 +49,10 @@
         <activity android:name=".SimpleChat"/>
         <activity android:name=".ConversationMenuActivity"/>
         <activity android:name=".PostDetailsActivity"/>
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>
