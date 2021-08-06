@@ -61,4 +61,9 @@
         <item>Acceptable</item>
     </string-array>
 
+    <string-array name="postOptions">
+        <item> </item>
+        <item>Delete</item>
+    </string-array>
+
 </resources>

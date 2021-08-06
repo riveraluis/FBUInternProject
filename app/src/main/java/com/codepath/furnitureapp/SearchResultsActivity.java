@@ -130,6 +130,7 @@ public class SearchResultsActivity extends AppCompatActivity {
                 //allPosts.clear();
                 for (Post post : posts) {
                     // Clear out before using
+                    ParseObject furniture = post.getParseObject(Post.KEY_FURNITURE);
                     post.setCommonFields(0);
                     // For debugging purposes print every post description to logcat
                     Log.i(TAG, "Post: " + post.getDescription() + ", username: " + post.getUser().getUsername());
@@ -139,11 +140,11 @@ public class SearchResultsActivity extends AppCompatActivity {
 
                     if (selectedPriceSorting) {
                         // Check if item is within set range
-                        if (postPrice >= low && postPrice < high) {
+                        if (postPrice >= low && postPrice < high && furniture != null && furniture.getString(Furniture.KEY_CATEGORY).equals(category)) {
                             setCommonFields(post);
                         }
                     }
-                    else {
+                    else if (furniture != null && furniture.getString(Furniture.KEY_CATEGORY).equals(category)) {
                         setCommonFields(post);
                     }
                 }
@@ -201,15 +202,16 @@ public class SearchResultsActivity extends AppCompatActivity {
                 }
                 allPosts.clear();
                 for (Post post: posts) {
+                    ParseObject furniture = post.getParseObject(Post.KEY_FURNITURE);
                     int postPrice = post.getPrice();
                     if (selectedPriceSorting) {
                         // Check if item is within set range
-                        if (postPrice >= low && postPrice < high) {
+                        if (postPrice >= low && postPrice < high && furniture != null && furniture.getString(Furniture.KEY_CATEGORY).equals(category)) {
                             Log.i(TAG, "description: " + post.getDescription() + " CF: " + post.getCommonFields());
                             allPosts.add(post);
                         }
                     }
-                    else {
+                    else if (furniture != null && furniture.getString(Furniture.KEY_CATEGORY).equals(category)) {
                         Log.i(TAG, "description: " + post.getDescription() + " CF: " + post.getCommonFields());
                         allPosts.add(post);
                     }
