@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="8dp"
+    app:cardMaxElevation="10dp"
+    app:cardPreventCornerOverlap="true">
+
+    <RelativeLayout
+        android:layout_width="200dp"
+        android:layout_height="200dp">
+
+        <ImageView
+            android:id="@+id/ivImageSimple"
+            android:layout_width="200dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
+            android:layout_height="200dp"
+            android:layout_marginTop="25dp"
+            android:scaleType="centerCrop"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <ImageView
+            android:id="@+id/ibLikeButtonSimple"
+            android:layout_width="19dp"
+            android:layout_height="19dp"
+            android:layout_marginEnd="20dp"
+            android:layout_alignEnd="@+id/ivImageSimple"
+            android:layout_marginTop="3dp"
+            android:layout_marginLeft="2dp"
+            android:background="@null"
+            android:clickable="true"
+            android:src="@drawable/favorited_selector" />
+
+        <ImageView
+            android:id="@+id/ivProfileImageSimple"
+            android:layout_width="19dp"
+            android:layout_height="19dp"
+            android:scaleType="centerCrop"
+            android:layout_marginLeft="4dp"
+            android:layout_marginTop="4dp"
+            tools:srcCompat="@tools:sample/avatars"
+            app:srcCompat="@drawable/ic_baseline_person_24"
+            android:layout_marginBottom="4dp"/>
+
+        <TextView
+            android:id="@+id/tvUsernameSimple"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginLeft="7dp"
+            android:textColor="@color/black"
+            android:layout_toEndOf="@+id/ivProfileImageSimple"
+            android:textSize="15dp"
+            android:text="luis" />
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

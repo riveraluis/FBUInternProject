@@ -1,6 +1,7 @@
 package com.codepath.furnitureapp.Fragments;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,12 +9,16 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.transition.Slide;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,6 +27,7 @@ import com.codepath.furnitureapp.Post;
 import com.codepath.furnitureapp.PostsAdapter;
 import com.codepath.furnitureapp.R;
 import com.codepath.furnitureapp.SignupActivity;
+import com.codepath.furnitureapp.SimplePostsAdapter;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -30,11 +36,13 @@ import com.parse.ParseUser;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
+
 public class HomeFragment extends Fragment {
 
     public static final String TAG = "PostsFragment";
     private RecyclerView rvPosts;
-    protected PostsAdapter adapter;
+    protected SimplePostsAdapter adapter;
     protected List<Post> allPosts;
     private SwipeRefreshLayout swipeContainer;
     private ImageView ivDirectMessages;
@@ -82,11 +90,13 @@ public class HomeFragment extends Fragment {
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-        adapter = new PostsAdapter(getContext(), allPosts);
+        adapter = new SimplePostsAdapter(getContext(), allPosts);
         // Set the adapter on the recycler view
         rvPosts.setAdapter(adapter);
         // Set the layout manager on the recycler view
-        rvPosts.setLayoutManager(new LinearLayoutManager(getContext()));
+        //rvPosts.setLayoutManager(new LinearLayoutManager(getContext()));
+       rvPosts.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        rvPosts.setItemAnimator(new SlideInUpAnimator());
         // Query posts
         queryPosts();
     }
@@ -94,7 +104,6 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
