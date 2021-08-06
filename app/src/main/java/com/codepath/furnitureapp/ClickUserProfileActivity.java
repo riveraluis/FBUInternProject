@@ -51,6 +51,8 @@ public class ClickUserProfileActivity extends AppCompatActivity {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+
         setContentView(R.layout.user_profile);
         ParseUser user = getIntent().getParcelableExtra("user");
 
@@ -75,7 +77,7 @@ public class ClickUserProfileActivity extends AppCompatActivity {
         queryPosts(user);
 
         tvUsername.setText(user.getUsername());
-        tvEmail.setText(user.getEmail());
+        tvEmail.setText(user.getString("publicEmail"));
         tvFullName.setText(user.getString(SignupActivity.KEY_FULLNAME));
         tvUserProfile.setText(user.getUsername() + "'s Profile");
 
@@ -170,4 +172,5 @@ public class ClickUserProfileActivity extends AppCompatActivity {
             }
         });
     }
+
 }

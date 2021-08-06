@@ -109,6 +109,7 @@ public class SignupActivity extends AppCompatActivity {
         user.setUsername(username);
         user.setPassword(password);
         user.setEmail(email);
+        user.put("publicEmail", email);
         user.put(KEY_FULLNAME, fullName);
         user.put(KEY_UNIVERSITY, school);
         user.put("profilePicture", file);
