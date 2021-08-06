@@ -53,8 +53,6 @@ public class ProfilePostsAdapter extends RecyclerView.Adapter<ProfilePostsAdapte
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             ivProfileImage = itemView.findViewById(R.id.ivProfilePost);
-
-
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
