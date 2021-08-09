@@ -17,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -48,6 +49,7 @@ public class PostDetailsActivity extends AppCompatActivity  {
     private TextView tvDescription;
     private ImageView ibLikeButton;
     private TextView tvPrice;
+    private List<String> likedPosts;
     private Spinner spPostOptions;
     public static final String TAG = "PostDetailsActivity";
 
@@ -90,6 +92,16 @@ public class PostDetailsActivity extends AppCompatActivity  {
             });
         }
 
+        if (post.getLikedArray().contains(ParseUser.getCurrentUser().getObjectId())) {
+            ibLikeButton.setSelected(true);
+        }
+        ibLikeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                likePost(post);
+            }
+        });
+
         tvDescription.setText(post.getDescription());
         tvUsername.setText(post.getUser().getUsername());
         tvPrice.setText(String.valueOf(post.getPrice()));
@@ -106,6 +118,7 @@ public class PostDetailsActivity extends AppCompatActivity  {
         if (profilepic != null) {
             Glide.with(getApplicationContext()).load(profilepic.getUrl()).apply(RequestOptions.circleCropTransform()).into(ivProfilePic);
         }
+
         
         ivProfilePic.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -127,6 +140,32 @@ public class PostDetailsActivity extends AppCompatActivity  {
         });
 
         overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
+    }
+
+    public void likePost(Post post) {
+        ibLikeButton.setSelected(!ibLikeButton.isSelected());
+        likedPosts =  post.getLikedArray();
+        if (ibLikeButton.isSelected()) {
+            if (!(post.getLikedArray().contains(ParseUser.getCurrentUser().getObjectId())))
+                likedPosts.add(ParseUser.getCurrentUser().getObjectId());
+        }
+
+        else likedPosts.remove(ParseUser.getCurrentUser().getObjectId());
+
+        post.setLikedArray(likedPosts);
+
+        post.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Log.e(TAG, "Error while saving post!", e);
+                    Toast.makeText(getApplicationContext(), "Error while saving post!", Toast.LENGTH_SHORT).show();
+                }
+                Log.i(TAG, "Post save was successful!");
+            }
+        });
+
+        likedPosts.clear();
     }
 
     @Override

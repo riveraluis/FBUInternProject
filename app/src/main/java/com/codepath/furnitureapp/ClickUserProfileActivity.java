@@ -51,8 +51,6 @@ public class ClickUserProfileActivity extends AppCompatActivity {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-
         setContentView(R.layout.user_profile);
         ParseUser user = getIntent().getParcelableExtra("user");
 

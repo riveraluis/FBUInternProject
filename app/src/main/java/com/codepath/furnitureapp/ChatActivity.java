@@ -33,7 +33,7 @@ public class ChatActivity extends AppCompatActivity {
     public static final String KEY_SENT_TO = "sentTo";
     static final String TAG = ChatActivity.class.getSimpleName();
     static final int MAX_CHAT_MESSAGES_TO_SHOW = 50;
-    static final long POLL_INTERVAL = TimeUnit.SECONDS.toMillis(10);
+    static final long POLL_INTERVAL = TimeUnit.SECONDS.toMillis(3);
     private EditText etMessage;
     private ImageButton ibSend;
     private RecyclerView rvChat;

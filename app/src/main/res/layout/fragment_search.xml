@@ -8,7 +8,21 @@
 
     <include
         android:id="@+id/include"
-        layout="@layout/furniture_attributes"/>
+        layout="@layout/furniture_attributes"
+        android:layout_below="@id/SearchText"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"/>
+
+    <TextView
+        android:id="@+id/SearchText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Search for furniture"
+        android:textSize="30dp"
+        android:layout_marginBottom="30dp"
+        android:layout_centerHorizontal="true"
+        android:fontFamily="@font/convergence"
+        android:textColor="@color/dark_blue"/>
 
     <TextView
         android:id="@+id/tvPrice"
